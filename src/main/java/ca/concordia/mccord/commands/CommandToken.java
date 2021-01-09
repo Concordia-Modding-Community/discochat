@@ -5,8 +5,10 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 
 import ca.concordia.mccord.Config;
+import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 
@@ -19,13 +21,11 @@ public class CommandToken extends Command {
     }
 
     @Override
-    protected int execute(CommandContext<CommandSource> commandContext) {
+    protected ITextComponent defaultExecute(CommandContext<CommandSource> commandContext) throws CommandException {
         String key = StringArgumentType.getString(commandContext, "key");
 
         Config.DISCORD_API_KEY.set(key);
 
-        sendFeedback(commandContext, new StringTextComponent(TextFormatting.GREEN + "Discord token set."));
-
-        return 1;
+        return new StringTextComponent(TextFormatting.GREEN + "Discord token set.");
     }
 }

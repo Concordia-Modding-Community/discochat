@@ -1,8 +1,13 @@
 package ca.concordia.mccord.chat;
 
+import java.util.Optional;
+
+import javax.naming.AuthenticationException;
+
 import ca.concordia.mccord.discord.DiscordManager;
 import ca.concordia.mccord.entity.UserManager;
 import ca.concordia.mccord.world.ServerManager;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -31,11 +36,30 @@ public class ChatManager {
         return String.format("%s: %s", playerName, message);
     }
 
-    public static void messageMC(PlayerEntity playerEntity, String authorName, MessageChannel channel, String message) {
-        User user = UserManager.getDiscordUser(playerEntity);
+    public static boolean hasAccess(User user, MessageChannel messageChannel) {
+        return hasAccess(Optional.ofNullable(user), Optional.ofNullable(messageChannel));
+    }
 
-        if (!DiscordManager.hasAccess(user, channel)) {
-            return;
+    public static boolean hasAccess(Optional<User> oUser, Optional<MessageChannel> oMessageChannel) {
+        try {
+            User user = oUser.get();
+
+            TextChannel textChannel = (TextChannel) oMessageChannel.get();
+
+            Member member = Optional.ofNullable(textChannel.getGuild().getMember(user)).get();
+
+            return member.hasAccess(textChannel);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public static void messageMC(PlayerEntity playerEntity, String authorName, MessageChannel channel, String message)
+            throws Exception {
+        User user = UserManager.getDiscordUser(playerEntity).get();
+
+        if (!hasAccess(user, channel)) {
+            throw new AuthenticationException();
         }
 
         String channelName = channel.getName();
@@ -53,74 +77,71 @@ public class ChatManager {
      * @param messageChannel
      * @param message
      */
-    public static void broadcastMC(Message message) {
+    public static void broadcastMC(Message message) throws Exception {
         User author = message.getAuthor();
 
-        ServerPlayerEntity playerEntity = UserManager.getMCPlayer(author.getId());
+        ServerPlayerEntity playerEntity = UserManager.getMCPlayer(author.getId()).get();
 
-        String authorName;
-
-        if (playerEntity == null) {
-            authorName = author.getName();
-        } else {
-            authorName = playerEntity.getName().getString();
-        }
+        String authorName = playerEntity.getName().getString();
 
         MessageChannel channel = message.getChannel();
+
         String content = message.getContentDisplay();
 
-        for (PlayerEntity player : ServerManager.getServer().getPlayerList().getPlayers()) {
+        for (PlayerEntity player : ServerManager.getServer().get().getPlayerList().getPlayers()) {
             messageMC(player, authorName, channel, content);
         }
     }
 
-    public static void broadcastMC(ITextComponent message) {
-        for (PlayerEntity player : ServerManager.getServer().getPlayerList().getPlayers()) {
+    public static void broadcastMC(ITextComponent message) throws Exception {
+        for (PlayerEntity player : ServerManager.getServer().get().getPlayerList().getPlayers()) {
             player.sendStatusMessage(message, false);
         }
     }
 
-    public static boolean broadcastAll(PlayerEntity playerEntity, String channelName, String message) {
-        TextChannel textChannel = DiscordManager.getChannelByName(channelName);
-        
-        if (playerEntity == null || textChannel == null) {
-            return false;
-        }
+    public static void broadcastAll(PlayerEntity playerEntity, String channelName, String message) throws Exception {
+        broadcastAll(Optional.ofNullable(playerEntity), channelName, message);
+    }
 
-        User user = UserManager.getDiscordUser(playerEntity.getUniqueID().toString());
+    public static void broadcastAll(Optional<PlayerEntity> oPlayerEntity, String channelName, String message)
+            throws Exception {
+        PlayerEntity playerEntity = oPlayerEntity.get();
 
-        if (!DiscordManager.hasAccess(user, textChannel)) {
-            return false;
+        TextChannel textChannel = DiscordManager.getChannelByName(channelName).get();
+
+        User user = UserManager.getDiscordUser(playerEntity.getUniqueID().toString()).get();
+
+        if (!hasAccess(user, textChannel)) {
+            throw new AuthenticationException();
         }
 
         ITextComponent mcMessage = generateMCMessage(playerEntity.getName().getString(), channelName, message);
 
-        for (PlayerEntity player : ServerManager.getServer().getPlayerList().getPlayers()) {
+        for (PlayerEntity player : ServerManager.getServer().get().getPlayerList().getPlayers()) {
             player.sendStatusMessage(mcMessage, false);
         }
 
         textChannel.sendMessage(generateDiscordMessage(user.getAsMention(), message)).queue();
-
-        return true;
     }
 
-    public static boolean discordChannelMessage(PlayerEntity playerEntity, String channelName, String message) {
-        TextChannel textChannel = DiscordManager.getChannelByName(channelName);
-        
-        if (playerEntity == null || textChannel == null) {
-            return false;
-        }
+    public static void discordChannelMessage(PlayerEntity playerEntity, String channelName, String message)
+            throws Exception {
+        discordChannelMessage(Optional.ofNullable(playerEntity), channelName, message);
+    }
 
-        User user = UserManager.getDiscordUser(playerEntity.getUniqueID().toString());
+    public static void discordChannelMessage(Optional<PlayerEntity> oPlayerEntity, String channelName, String message)
+            throws Exception {
+        PlayerEntity playerEntity = oPlayerEntity.get();
+        TextChannel textChannel = DiscordManager.getChannelByName(channelName).get();
 
-        if (!DiscordManager.hasAccess(user, textChannel)) {
-            return false;
+        User user = UserManager.getDiscordUser(playerEntity.getUniqueID().toString()).get();
+
+        if (!hasAccess(user, textChannel)) {
+            throw new AuthenticationException();
         }
 
         textChannel.sendMessage(generateDiscordMessage(user.getAsMention(), message)).queue();
 
         messageMC(playerEntity, playerEntity.getName().getString(), textChannel, message);
-
-        return true;
     }
 }

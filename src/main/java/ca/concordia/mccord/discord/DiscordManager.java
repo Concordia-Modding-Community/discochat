@@ -1,6 +1,7 @@
 package ca.concordia.mccord.discord;
 
 import java.util.List;
+import java.util.Optional;
 
 import ca.concordia.mccord.Config;
 import ca.concordia.mccord.MCCord;
@@ -11,13 +12,13 @@ import ca.concordia.mccord.discord.commands.DiscordCommands;
 import ca.concordia.mccord.utils.StringUtils;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.minecraft.command.CommandException;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -28,7 +29,7 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
  */
 @Mod.EventBusSubscriber(modid = Resources.MOD_ID, bus = Bus.FORGE)
 public class DiscordManager extends ListenerAdapter {
-    private static JDA jda;
+    private static Optional<JDA> jda = Optional.empty();
 
     @SubscribeEvent
     public static void onWorldLoad(WorldEvent.Load event) {
@@ -47,18 +48,24 @@ public class DiscordManager extends ListenerAdapter {
      * @param token The Discord API Token.
      */
     public static boolean connect(String token) {
-        if (isConnected() || token.isBlank()) {
-            return false;
-        }
-
         try {
-            jda = JDABuilder.createDefault(token).build();
+            if (isConnected()) {
+                throw new Exception("JDA already connected.");
+            }
 
-            jda.addEventListener(new DiscordManager());
+            if (token.isBlank()) {
+                throw new Exception("Invalid token.");
+            }
 
-            jda.awaitReady();
+            JDA tJDA = JDABuilder.createDefault(token).build();
+
+            tJDA.addEventListener(new DiscordManager());
+
+            tJDA.awaitReady();
+
+            jda = Optional.ofNullable(tJDA);
         } catch (Exception e) {
-            e.printStackTrace();
+            MCCord.LOGGER.error(e.getMessage());
 
             return false;
         }
@@ -72,7 +79,7 @@ public class DiscordManager extends ListenerAdapter {
      * @return Discord connection active.
      */
     public static boolean isConnected() {
-        return jda != null;
+        return jda.isPresent();
     }
 
     /**
@@ -80,13 +87,11 @@ public class DiscordManager extends ListenerAdapter {
      * automatically called by ServerEvents.
      */
     public static void disconnect() {
-        if (!isConnected()) {
-            return;
-        }
+        try {
+            jda.get().shutdown();
 
-        jda.shutdown();
-
-        jda = null;
+            jda = Optional.empty();
+        } catch (Exception e) {}
     }
 
     @Override
@@ -110,17 +115,16 @@ public class DiscordManager extends ListenerAdapter {
      * @param message Message to handle.
      */
     private void handleCommand(Message message) {
-        List<String> tokens = StringUtils.tokenize(message.getContentRaw());
+        try {
+            List<String> tokens = StringUtils.tokenize(message.getContentRaw());
 
-        Command command = DiscordCommands.get(tokens);
+            Command command = DiscordCommands.getCommand(tokens).orElseThrow(
+                    () -> new CommandException(new StringTextComponent("Unknown command " + tokens.get(0))));
 
-        if (command == null) {
-            message.getChannel().sendMessage(String.format("Unknown command %s.", tokens.get(0))).queue();
-
-            return;
+            command.execute(message);
+        } catch (CommandException e) {
+            message.getChannel().sendMessage(e.getMessage()).queue();
         }
-
-        command.execute(message);
     }
 
     /**
@@ -129,84 +133,60 @@ public class DiscordManager extends ListenerAdapter {
      * @param message Message to handle.
      */
     private void handleMessage(Message message) {
-        ChatManager.broadcastMC(message);
+        try {
+            ChatManager.broadcastMC(message);
+        } catch(Exception e) {
+            message.getChannel().sendMessage("Unable to send message to Minecraft.").queue();
+        }
     }
 
     /**
      * Gets list of Discord channels.
      */
-    public static List<TextChannel> getChannels() {
-        if (!isConnected()) {
-            return null;
+    public static Optional<List<TextChannel>> getChannels() {
+        try {
+            return Optional.ofNullable(jda.get().getTextChannels());
+        } catch(Exception e) {
+            return Optional.empty();
         }
-
-        return jda.getTextChannels();
     }
 
     /**
      * Gets a Discord channel by name.
+     * 
+     * TODO: Make sure the channels is singular?
      */
-    public static TextChannel getChannelByName(String name) {
-        if (!isConnected()) {
-            return null;
+    public static Optional<TextChannel> getChannelByName(String name) {
+        try {
+            List<TextChannel> channels = jda.get().getTextChannelsByName(name, true);
+
+            return Optional.ofNullable(channels.get(0));
+        } catch(Exception e) {
+            return Optional.empty();
         }
-
-        List<TextChannel> channels = jda.getTextChannelsByName(name, true);
-
-        if (channels == null || channels.size() == 0) {
-            return null;
-        }
-
-        return channels.get(0);
     }
 
-    public static User getUserFromUUID(String uuid) {
-        if (!isConnected()) {
-            return null;
+    public static Optional<User> getUserFromUUID(String uuid) {
+        try {
+            return Optional.ofNullable(jda.get().retrieveUserById(uuid).complete());
+        } catch(Exception e) {
+            return Optional.empty();
         }
-
-        return jda.retrieveUserById(uuid).complete();
     }
 
-    public static User getUserByTag(String tag) {
-        if (!isConnected()) {
-            return null;
+    public static Optional<User> getUserByTag(String tag) {
+        try {
+            return Optional.ofNullable(jda.get().getUserByTag(tag));
+        } catch(Exception e) {
+            return Optional.empty();
         }
-
-        return jda.getUserByTag(tag);
     }
 
-    public static User getUserByTag(String username, String discriminator) {
-        if(!isConnected()) {
-            return null;
+    public static Optional<User> getUserByTag(String username, String discriminator) {
+        try {
+            return Optional.ofNullable(jda.get().getUserByTag(username, discriminator));
+        } catch(Exception e) {
+            return Optional.empty();
         }
-
-        return jda.getUserByTag(username, discriminator);
-    }
-
-    public static boolean hasAccess(User user, MessageChannel messageChannel) {
-        if (!isConnected()) {
-            return false;
-        }
-
-        if(user == null || user.isBot()) {
-            return false;
-        }
-
-        if(messageChannel == null || !(messageChannel instanceof TextChannel)) {
-            return false;
-        }
-
-        TextChannel textChannel = (TextChannel) messageChannel;
-
-        Member member = textChannel.getGuild().getMember(user);
-
-        if (member == null) {
-            MCCord.LOGGER.error("Unable to find member.");
-
-            return false;
-        }
-
-        return member.hasAccess(textChannel);
     }
 }

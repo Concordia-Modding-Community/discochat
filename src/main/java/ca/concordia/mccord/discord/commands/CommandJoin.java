@@ -1,6 +1,7 @@
 package ca.concordia.mccord.discord.commands;
 
 import java.util.List;
+import java.util.Optional;
 
 import ca.concordia.mccord.entity.UserManager;
 import net.dv8tion.jda.api.entities.Message;
@@ -18,9 +19,9 @@ public class CommandJoin extends Command {
 
         String minecraftName = arguments.get(0);
 
-        ServerPlayerEntity playerEntity = UserManager.fromMCName(minecraftName);
+        Optional<ServerPlayerEntity> playerEntity = UserManager.fromMCName(minecraftName);
 
-        if(playerEntity == null) {
+        if(playerEntity.isEmpty()) {
             message.getChannel().sendMessage(String.format("Unable to find MC username.")).queue();
 
             return;
@@ -28,7 +29,7 @@ public class CommandJoin extends Command {
     
         String discordUUID = message.getAuthor().getId();
 
-        String mcUUID = playerEntity.getUniqueID().toString();
+        String mcUUID = playerEntity.get().getUniqueID().toString();
 
         UserManager.linkUsers(discordUUID, mcUUID);
 

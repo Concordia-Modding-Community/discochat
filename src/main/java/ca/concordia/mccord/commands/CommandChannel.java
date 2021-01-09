@@ -5,10 +5,11 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 
 import ca.concordia.mccord.entity.UserManager;
+import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 
@@ -20,26 +21,16 @@ public class CommandChannel extends Command {
     }
 
     @Override
-    protected int execute(CommandContext<CommandSource> commandContext) {
-        Entity entity = commandContext.getSource().getEntity();
+    protected ITextComponent defaultExecute(CommandContext<CommandSource> commandContext) throws CommandException {
+        PlayerEntity playerEntity = getSourcePlayer(commandContext).get();
 
-        if (entity == null || !(entity instanceof PlayerEntity)) {
-            return 0;
-        }
-
-        PlayerEntity player = (PlayerEntity) entity;
         String channel = StringArgumentType.getString(commandContext, "channel");
 
-        if (!UserManager.setCurrentChannel(player, channel)) {
-            sendErrorMessage(commandContext, new StringTextComponent(TextFormatting.RED + "Unable to find channel."));
-
-            return 0;
+        if (!UserManager.setCurrentChannel(playerEntity, channel)) {
+            throw new CommandException(new StringTextComponent(TextFormatting.RED + "Unable to find channel."));
         }
 
-        sendFeedback(commandContext, new StringTextComponent(TextFormatting.GREEN + "Switched to " + TextFormatting.BLUE
-                + "#" + channel + TextFormatting.GREEN + "."));
-
-        return 1;
+        return new StringTextComponent(TextFormatting.GREEN + "Switched to " + TextFormatting.BLUE + "#" + channel
+                + TextFormatting.GREEN + ".");
     }
-
 }

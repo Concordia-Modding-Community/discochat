@@ -1,11 +1,11 @@
 package ca.concordia.mccord.entity;
 
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.UUID;
 
 import ca.concordia.mccord.discord.DiscordManager;
 import ca.concordia.mccord.world.ServerManager;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -17,81 +17,89 @@ public class UserManager {
     private static HashMap<String, String> MC_DISCORD_MAP = new HashMap<String, String>();
     private static HashMap<String, String> USER_CHANNEL = new HashMap<String, String>();
 
-    private static void insertUUID(String discordUUID, String mcUUID) {
+    private static boolean insertUUID(String discordUUID, String mcUUID) {
         DISCORD_MC_MAP.put(discordUUID, mcUUID);
         MC_DISCORD_MAP.put(mcUUID, discordUUID);
+
+        return true;
     }
 
-    public static void linkUsers(String discordUUID, String mcUUID) {
-        insertUUID(discordUUID, mcUUID);
+    public static boolean linkUsers(String discordUUID, String mcUUID) {
+        return insertUUID(discordUUID, mcUUID);
     }
 
-    public static void linkUsers(ServerPlayerEntity player, User user) {
-        String mcUUID = player.getUniqueID().toString();
-        String discordUUID = user.getId();
+    public static boolean linkUsers(Optional<ServerPlayerEntity> player, Optional<User> user) {
+        try {
+            String mcUUID = player.get().getUniqueID().toString();
+            String discordUUID = user.get().getId();
 
-        insertUUID(discordUUID, mcUUID);
-    }
-
-    public static ServerPlayerEntity getMCPlayer(String discordUUID) {
-        if(!DISCORD_MC_MAP.containsKey(discordUUID)) {
-            return null;
+            return linkUsers(discordUUID, mcUUID);
+        } catch (Exception e) {
+            return false;
         }
-
-        return fromMCUUID(DISCORD_MC_MAP.get(discordUUID));
     }
 
-    public static User getDiscordUser(String mcUUID) {
-        if(!MC_DISCORD_MAP.containsKey(mcUUID)) {
-            return null;
+    public static Optional<ServerPlayerEntity> getMCPlayer(String discordUUID) {
+        try {
+            return fromMCUUID(DISCORD_MC_MAP.get(discordUUID));
+        } catch (Exception e) {
+            return Optional.empty();
         }
-
-        return fromDiscordUUID(MC_DISCORD_MAP.get(mcUUID));
     }
 
-    public static User getDiscordUser(PlayerEntity playerEntity) {
+    public static Optional<User> getDiscordUser(String mcUUID) {
+        try {
+            return fromDiscordUUID(MC_DISCORD_MAP.get(mcUUID));
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    public static Optional<User> getDiscordUser(PlayerEntity playerEntity) {
         return getDiscordUser(playerEntity.getUniqueID().toString());
     }
 
     public static boolean setCurrentChannel(PlayerEntity player, String channelName) {
-        TextChannel textChannel = DiscordManager.getChannelByName(channelName);
-
-        if (textChannel == null) {
+        try {
+            USER_CHANNEL.put(player.getUniqueID().toString(),
+                    DiscordManager.getChannelByName(channelName).get().getName());
+        } catch (Exception e) {
             return false;
         }
-
-        USER_CHANNEL.put(player.getUniqueID().toString(), channelName);
 
         return true;
     }
 
     public static String getCurrentChannel(PlayerEntity player) {
-        String uuid = player.getUniqueID().toString();
-        
-        if (!USER_CHANNEL.containsKey(uuid)) {
-            return DEFAULT_CHANNEL;
+        return Optional.ofNullable(USER_CHANNEL.get(player.getUniqueID().toString())).orElse(DEFAULT_CHANNEL);
+    }
+
+    public static Optional<ServerPlayerEntity> fromMCUUID(String uuid) {
+        try {
+            return Optional
+                    .ofNullable(ServerManager.getServer().get().getPlayerList().getPlayerByUUID(UUID.fromString(uuid)));
+        } catch (Exception e) {
+            return Optional.empty();
         }
-
-        return USER_CHANNEL.get(uuid);
     }
 
-    public static ServerPlayerEntity fromMCUUID(String uuid) {
-        return ServerManager.getServer().getPlayerList().getPlayerByUUID(UUID.fromString(uuid));
+    public static Optional<ServerPlayerEntity> fromMCName(String name) {
+        try {
+            return Optional.ofNullable(ServerManager.getServer().get().getPlayerList().getPlayerByUsername(name));
+        } catch (Exception e) {
+            return Optional.empty();
+        }
     }
 
-    public static ServerPlayerEntity fromMCName(String name) {
-        return ServerManager.getServer().getPlayerList().getPlayerByUsername(name);
-    }
-
-    public static User fromDiscordUUID(String uuid) {
+    public static Optional<User> fromDiscordUUID(String uuid) {
         return DiscordManager.getUserFromUUID(uuid);
     }
 
-    public static User fromDiscordTag(String username, String discriminator) {
+    public static Optional<User> fromDiscordTag(String username, String discriminator) {
         return DiscordManager.getUserByTag(username, discriminator);
     }
 
-    public static User fromDiscordTag(String tag) {
+    public static Optional<User> fromDiscordTag(String tag) {
         return DiscordManager.getUserByTag(tag);
     }
 }

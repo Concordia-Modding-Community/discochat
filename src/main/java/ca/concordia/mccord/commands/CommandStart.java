@@ -5,8 +5,10 @@ import com.mojang.brigadier.context.CommandContext;
 
 import ca.concordia.mccord.Config;
 import ca.concordia.mccord.discord.DiscordManager;
+import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 
@@ -18,29 +20,19 @@ public class CommandStart extends Command {
     }
 
     @Override
-    protected int execute(CommandContext<CommandSource> commandContext) {
+    protected ITextComponent defaultExecute(CommandContext<CommandSource> commandContext) throws CommandException {
         if (DiscordManager.isConnected()) {
-            sendErrorMessage(commandContext,
-                    new StringTextComponent(TextFormatting.RED + "Discord already connected."));
-
-            return 0;
+            throw new CommandException(new StringTextComponent(TextFormatting.RED + "Discord already connected."));
         }
 
         if (Config.DISCORD_API_KEY.get().isBlank()) {
-            sendErrorMessage(commandContext, new StringTextComponent(TextFormatting.RED + "No valid token set."));
-
-            return 0;
+            throw new CommandException(new StringTextComponent(TextFormatting.RED + "No valid token set."));
         }
 
         if (!DiscordManager.connect(Config.DISCORD_API_KEY.get())) {
-            sendErrorMessage(commandContext,
-                    new StringTextComponent(TextFormatting.RED + "Unable to connect to Discord."));
-
-            return 0;
+            throw new CommandException(new StringTextComponent(TextFormatting.RED + "Unable to connect to Discord."));
         }
 
-        sendFeedback(commandContext, new StringTextComponent(TextFormatting.GREEN + "Discord connected."));
-
-        return 1;
+        return new StringTextComponent(TextFormatting.GREEN + "Discord connected.");
     }
 }

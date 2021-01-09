@@ -1,5 +1,7 @@
 package ca.concordia.mccord.world;
 
+import java.util.Optional;
+
 import ca.concordia.mccord.Resources;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -22,7 +24,7 @@ public class ServerManager {
         SERVER = null;
     }
 
-    public static MinecraftServer getServer() {
-        return SERVER;
+    public static Optional<MinecraftServer> getServer() {
+        return Optional.of(SERVER);
     }
 }

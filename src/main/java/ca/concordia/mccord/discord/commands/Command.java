@@ -1,5 +1,6 @@
 package ca.concordia.mccord.discord.commands;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ca.concordia.mccord.utils.StringUtils;
@@ -22,6 +23,10 @@ public abstract class Command {
      */
     protected static List<String> getArguments(String message) {
         List<String> tokens = StringUtils.tokenize(message);
+
+        if(tokens.size() < 1) {
+            return new ArrayList<String>();
+        }
 
         return tokens.subList(1, tokens.size());
     }

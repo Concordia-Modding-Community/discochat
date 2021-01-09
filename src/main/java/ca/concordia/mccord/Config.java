@@ -1,9 +1,7 @@
 package ca.concordia.mccord;
 
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber
 public class Config {
     public static final String CATEGORY_DISCORD = "discord";
 

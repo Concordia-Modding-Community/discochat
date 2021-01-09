@@ -2,6 +2,7 @@ package ca.concordia.mccord.discord.commands;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 public class DiscordCommands {
     private static final Command[] COMMANDS = new Command[] { new CommandJoin() };
@@ -19,15 +20,15 @@ public class DiscordCommands {
      * @param tokens Input tokens.
      * @return Command instance.
      */
-    public static Command get(List<String> tokens) {
+    public static Optional<Command> getCommand(List<String> tokens) {
         String commandWithPrefix = tokens.get(0);
 
         String command = commandWithPrefix.substring(Command.COMMAND_PREFIX.length()).strip();
 
         if (!COMMAND_MAPPING.containsKey(command)) {
-            return null;
+            return Optional.empty();
         }
 
-        return COMMAND_MAPPING.get(command);
+        return Optional.ofNullable(COMMAND_MAPPING.get(command));
     }
 }
