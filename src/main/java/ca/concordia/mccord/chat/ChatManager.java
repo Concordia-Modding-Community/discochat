@@ -6,7 +6,7 @@ import javax.naming.AuthenticationException;
 
 import ca.concordia.mccord.discord.DiscordManager;
 import ca.concordia.mccord.entity.MCCordUser;
-import ca.concordia.mccord.utils.ServerManager;
+import ca.concordia.mccord.server.ServerManager;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
