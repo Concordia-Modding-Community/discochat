@@ -4,9 +4,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 import ca.concordia.mccord.discord.DiscordManager;
-import ca.concordia.mccord.utils.DataManager;
-import ca.concordia.mccord.utils.ServerManager;
-import ca.concordia.mccord.utils.UserData;
+import ca.concordia.mccord.data.DataManager;
+import ca.concordia.mccord.data.UserData;
+import ca.concordia.mccord.server.ServerManager;
 import net.dv8tion.jda.api.entities.User;
 import net.minecraft.command.CommandException;
 import net.minecraft.entity.player.PlayerEntity;

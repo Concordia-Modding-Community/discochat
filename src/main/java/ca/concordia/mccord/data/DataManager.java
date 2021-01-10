@@ -1,4 +1,4 @@
-package ca.concordia.mccord.utils;
+package ca.concordia.mccord.data;
 
 import java.io.File;
 import java.util.Optional;

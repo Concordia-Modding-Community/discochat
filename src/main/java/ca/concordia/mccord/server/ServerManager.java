@@ -1,4 +1,4 @@
-package ca.concordia.mccord.utils;
+package ca.concordia.mccord.server;
 
 import java.util.Optional;
 

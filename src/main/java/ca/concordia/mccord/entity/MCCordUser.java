@@ -9,9 +9,9 @@ import java.util.stream.Collectors;
 
 import ca.concordia.mccord.Config;
 import ca.concordia.mccord.chat.ChatMessage;
+import ca.concordia.mccord.data.DataManager;
+import ca.concordia.mccord.data.UserData;
 import ca.concordia.mccord.discord.DiscordManager;
-import ca.concordia.mccord.utils.DataManager;
-import ca.concordia.mccord.utils.UserData;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
