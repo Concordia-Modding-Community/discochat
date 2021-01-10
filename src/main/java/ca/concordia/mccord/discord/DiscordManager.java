@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import ca.concordia.mccord.Config;
 import ca.concordia.mccord.MCCord;
-import ca.concordia.mccord.Resources;
 import ca.concordia.mccord.chat.ChatManager;
 import ca.concordia.mccord.discord.commands.Command;
 import ca.concordia.mccord.discord.commands.DiscordCommands;
@@ -21,25 +20,17 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.minecraft.command.CommandException;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
-
 /**
  * A wrapper around JDA.
  */
-@Mod.EventBusSubscriber(modid = Resources.MOD_ID, bus = Bus.FORGE)
 public class DiscordManager extends ListenerAdapter {
     private static Optional<JDA> jda = Optional.empty();
 
-    @SubscribeEvent
-    public static void onWorldLoad(WorldEvent.Load event) {
+    public static void register() {
         DiscordManager.connect(Config.DISCORD_API_KEY.get());
     }
 
-    @SubscribeEvent
-    public static void onWorldUnload(WorldEvent.Unload event) {
+    public static void unregister() {
         DiscordManager.disconnect();
     }
 

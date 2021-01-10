@@ -5,27 +5,24 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import ca.concordia.mccord.Config;
-import ca.concordia.mccord.Resources;
 import net.dv8tion.jda.api.entities.User;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
-import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
 
-@Mod.EventBusSubscriber(modid = Resources.MOD_ID, bus = Bus.FORGE)
 public class DataManager implements INBTSerializable<CompoundNBT> {
     private static final String PLAYER_DATA = "playerData";
     private static CompoundNBT playerDataNBT = new CompoundNBT();
     private static final String DISCORD_MAPPING = "discordUUID";
     private static CompoundNBT discordMappingNBT = new CompoundNBT();
 
-    @SubscribeEvent
-    public static void onServerStarted(FMLServerStartedEvent event) {
+    public static void register() {
         loadUserData();
+    }
+
+    public static void unregister() {
+        saveUserData();
     }
 
     public static boolean containsUser(User user) {
