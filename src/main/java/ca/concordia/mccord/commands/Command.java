@@ -11,13 +11,13 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 
-import ca.concordia.mccord.entity.UserManager;
+import ca.concordia.mccord.entity.MCCordUser;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.Util;
 import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.ITextComponent;
@@ -25,14 +25,27 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 
 public abstract class Command {
-    public static final String ALL_CHANNELS = "all";
-    public static final String NO_CHANNEL = "none";
-
-    public static final SuggestionProvider<CommandSource> CHANNEL_SUGGEST = (context, builder) -> {
+    public static final SuggestionProvider<CommandSource> ACCESSIBLE_CHANNEL_SUGGEST = (context, builder) -> {
         List<String> channels = new ArrayList<String>();
 
         try {
-            List<TextChannel> textChannels = UserManager.getAccessibleTextChannels(context.getSource().asPlayer());
+            List<TextChannel> textChannels = MCCordUser.fromMCPlayerEntity(context.getSource().asPlayer()).get()
+                    .getAccessibleChannels();
+
+            channels = textChannels.stream().map(channel -> channel.getName()).collect(Collectors.toList());
+        } catch (Exception e) {
+        }
+
+        return ISuggestionProvider.suggest(channels.toArray(new String[0]), builder);
+    };
+
+    // TODO: Prevent code duplicate.
+    public static final SuggestionProvider<CommandSource> VISIBLE_CHANNEL_SUGGEST = (context, builder) -> {
+        List<String> channels = new ArrayList<String>();
+
+        try {
+            List<TextChannel> textChannels = MCCordUser.fromMCPlayerEntity(context.getSource().asPlayer()).get()
+                    .getVisibleChannels();
 
             channels = textChannels.stream().map(channel -> channel.getName()).collect(Collectors.toList());
         } catch (Exception e) {
@@ -78,7 +91,13 @@ public abstract class Command {
         commandContext.getSource().sendErrorMessage(message);
     }
 
-    protected Optional<PlayerEntity> getSourcePlayer(CommandContext<CommandSource> commandContext) {
+    public Optional<MCCordUser> getSourceMCCordUser(CommandContext<CommandSource> commandContext) {
+        Optional<ServerPlayerEntity> playerEntity = getSourcePlayer(commandContext);
+
+        return MCCordUser.fromMCPlayerEntity(playerEntity);
+    }
+
+    public Optional<ServerPlayerEntity> getSourcePlayer(CommandContext<CommandSource> commandContext) {
         Optional<Entity> oEntity = Optional.ofNullable(commandContext.getSource().getEntity());
 
         if (oEntity.isEmpty()) {
@@ -87,11 +106,11 @@ public abstract class Command {
 
         Entity entity = oEntity.get();
 
-        if (!(entity instanceof PlayerEntity)) {
+        if (!(entity instanceof ServerPlayerEntity)) {
             return Optional.empty();
         }
 
-        return Optional.of((PlayerEntity) entity);
+        return Optional.of((ServerPlayerEntity) entity);
     }
 
     protected int execute(CommandContext<CommandSource> commandContext) {

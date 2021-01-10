@@ -34,7 +34,7 @@ public class CommandLink extends Command {
 
         String discordUUID = user.getId();
 
-        UserManager.linkUsers(discordUUID, mcUUID);
+        UserManager.link(mcUUID, discordUUID);
 
         user.openPrivateChannel()
                 .flatMap(

@@ -13,6 +13,7 @@ import ca.concordia.mccord.utils.StringUtils;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -194,6 +195,16 @@ public class DiscordManager extends ListenerAdapter {
             return Optional.ofNullable(jda.get().getUserByTag(username, discriminator));
         } catch(Exception e) {
             return Optional.empty();
+        }
+    }
+
+    public static boolean isChannelAccessible(User user, MessageChannel channel) {
+        try {
+            TextChannel textChannel = (TextChannel) channel;
+
+            return textChannel.getGuild().getMember(user).hasAccess(textChannel);
+        } catch (Exception e) {
+            return false;
         }
     }
 }

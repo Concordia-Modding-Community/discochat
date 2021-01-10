@@ -1,4 +1,4 @@
-package ca.concordia.mccord.world;
+package ca.concordia.mccord.utils;
 
 import java.util.Optional;
 
