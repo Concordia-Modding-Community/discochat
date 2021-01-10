@@ -56,7 +56,7 @@ public class ChatManager {
 
     public static void messageMC(PlayerEntity playerEntity, String authorName, MessageChannel channel, String message)
             throws Exception {
-        User user = UserManager.getDiscordUser(playerEntity).get();
+        User user = UserManager.getDiscordUser(playerEntity).orElseThrow(AuthenticationException::new);
 
         if (!hasAccess(user, channel)) {
             throw new AuthenticationException();
@@ -80,7 +80,7 @@ public class ChatManager {
     public static void broadcastMC(Message message) throws Exception {
         User author = message.getAuthor();
 
-        ServerPlayerEntity playerEntity = UserManager.getMCPlayer(author.getId()).get();
+        ServerPlayerEntity playerEntity = UserManager.getMCPlayer(author.getId()).orElseThrow(AuthenticationException::new);
 
         String authorName = playerEntity.getName().getString();
 
@@ -109,7 +109,7 @@ public class ChatManager {
 
         TextChannel textChannel = DiscordManager.getChannelByName(channelName).get();
 
-        User user = UserManager.getDiscordUser(playerEntity.getUniqueID().toString()).get();
+        User user = UserManager.getDiscordUser(playerEntity.getUniqueID().toString()).orElseThrow(AuthenticationException::new);
 
         if (!hasAccess(user, textChannel)) {
             throw new AuthenticationException();
@@ -134,7 +134,7 @@ public class ChatManager {
         PlayerEntity playerEntity = oPlayerEntity.get();
         TextChannel textChannel = DiscordManager.getChannelByName(channelName).get();
 
-        User user = UserManager.getDiscordUser(playerEntity.getUniqueID().toString()).get();
+        User user = UserManager.getDiscordUser(playerEntity.getUniqueID().toString()).orElseThrow(AuthenticationException::new);
 
         if (!hasAccess(user, textChannel)) {
             throw new AuthenticationException();

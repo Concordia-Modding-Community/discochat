@@ -1,14 +1,21 @@
 package ca.concordia.mccord.commands;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
 
+import ca.concordia.mccord.entity.UserManager;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandSource;
+import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Util;
@@ -18,11 +25,28 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 
 public abstract class Command {
+    public static final String ALL_CHANNELS = "all";
+    public static final String NO_CHANNEL = "none";
+
+    public static final SuggestionProvider<CommandSource> CHANNEL_SUGGEST = (context, builder) -> {
+        List<String> channels = new ArrayList<String>();
+
+        try {
+            List<TextChannel> textChannels = UserManager.getAccessibleTextChannels(context.getSource().asPlayer());
+
+            channels = textChannels.stream().map(channel -> channel.getName()).collect(Collectors.toList());
+        } catch (Exception e) {
+        }
+
+        return ISuggestionProvider.suggest(channels.toArray(new String[0]), builder);
+    };
+
     public static String COMMAND_PREFIX = "discord";
 
     protected abstract LiteralArgumentBuilder<CommandSource> parser();
 
-    protected abstract ITextComponent defaultExecute(CommandContext<CommandSource> commandContext) throws CommandException;
+    protected abstract ITextComponent defaultExecute(CommandContext<CommandSource> commandContext)
+            throws CommandException;
 
     public void register(CommandDispatcher<CommandSource> dispatcher) {
         dispatcher.register(this.parser());
@@ -74,7 +98,8 @@ public abstract class Command {
         return execute(commandContext, (context) -> defaultExecute(context));
     }
 
-    protected int execute(CommandContext<CommandSource> commandContext, Function<CommandContext<CommandSource>, ITextComponent> function) {
+    protected int execute(CommandContext<CommandSource> commandContext,
+            Function<CommandContext<CommandSource>, ITextComponent> function) {
         try {
             ITextComponent text = function.apply(commandContext);
 
@@ -83,11 +108,11 @@ public abstract class Command {
             }
 
             return 1;
-        } catch(CommandException e) {
+        } catch (CommandException e) {
             sendErrorMessage(commandContext, e.getComponent());
 
             return 0;
-        } catch(Exception e) {
+        } catch (Exception e) {
             return 0;
         }
     }

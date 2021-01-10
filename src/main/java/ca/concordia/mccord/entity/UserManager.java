@@ -1,11 +1,16 @@
 package ca.concordia.mccord.entity;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+import ca.concordia.mccord.chat.ChatManager;
 import ca.concordia.mccord.discord.DiscordManager;
 import ca.concordia.mccord.world.ServerManager;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.minecraft.command.CommandException;
 import net.minecraft.entity.player.PlayerEntity;
@@ -105,5 +110,24 @@ public class UserManager {
 
     public static Optional<User> fromDiscordTag(String tag) {
         return DiscordManager.getUserByTag(tag);
+    }
+
+    public static List<TextChannel> getAccessibleTextChannels(PlayerEntity playerEntity) {
+        try {
+            User user = UserManager.getDiscordUser(playerEntity).get();
+
+            return getAccessibleTextChannels(user);
+        } catch (Exception e) {
+            return new ArrayList<TextChannel>();
+        }
+    }
+
+    public static List<TextChannel> getAccessibleTextChannels(User user) {
+        try {
+            return DiscordManager.getChannels().get().stream().filter(channel -> ChatManager.hasAccess(user, channel))
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            return new ArrayList<TextChannel>();
+        }
     }
 }

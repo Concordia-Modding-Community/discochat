@@ -21,7 +21,7 @@ public class ChatEvents {
     public static void onServerChat(ServerChatEvent event) {
         if (!DiscordManager.isConnected()) {
             event.setCanceled(false);
-            
+
             return;
         }
 
@@ -29,12 +29,16 @@ public class ChatEvents {
 
         try {
             ChatManager.broadcastAll(player, UserManager.getCurrentChannel(player), event.getMessage());
-        } catch(AuthenticationException e) {
-            player.sendMessage(new StringTextComponent(TextFormatting.RED + "Invalid credentials to send message to Discord."), Util.DUMMY_UUID);
-        } catch(Exception e) {
+        } catch (AuthenticationException e) {
+            player.sendMessage(
+                    new StringTextComponent(TextFormatting.RED + "Invalid credentials to send message to Discord. "
+                            + "Make sure your account is linked and you have the privilidges."),
+                    Util.DUMMY_UUID);
+        } catch (Exception e) {
             e.printStackTrace();
 
-            player.sendMessage(new StringTextComponent(TextFormatting.RED + "Unable to send message."), Util.DUMMY_UUID);
+            player.sendMessage(new StringTextComponent(TextFormatting.RED + "Unable to send message."),
+                    Util.DUMMY_UUID);
         }
 
         event.setCanceled(true);

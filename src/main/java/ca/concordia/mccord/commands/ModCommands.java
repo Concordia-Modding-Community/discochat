@@ -12,7 +12,7 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 @Mod.EventBusSubscriber(modid = Resources.MOD_ID, bus = Bus.FORGE)
 public class ModCommands {
     public static final Command[] COMMANDS = new Command[] { new CommandToken(), new CommandStart(),
-            new CommandMessage(), new CommandLink(), new CommandStop(), new CommandChannel() };
+            new CommandMessage(), new CommandLink(), new CommandStop(), new CommandSwitch() };
 
     @SubscribeEvent
     public static void register(RegisterCommandsEvent event) {

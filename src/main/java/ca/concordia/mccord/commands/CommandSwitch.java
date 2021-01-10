@@ -13,11 +13,12 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 
-public class CommandChannel extends Command {
+public class CommandSwitch extends Command {
     @Override
     protected LiteralArgumentBuilder<CommandSource> parser() {
-        return Commands.literal(COMMAND_PREFIX).then(Commands.literal("channel").then(Commands
-                .argument("channel", StringArgumentType.word()).executes(commandContext -> execute(commandContext))));
+        return Commands.literal(COMMAND_PREFIX)
+                .then(Commands.literal("switch").then(Commands.argument("channel", StringArgumentType.word())
+                        .suggests(Command.CHANNEL_SUGGEST).executes(commandContext -> execute(commandContext))));
     }
 
     @Override
@@ -27,7 +28,8 @@ public class CommandChannel extends Command {
         String channel = StringArgumentType.getString(commandContext, "channel");
 
         if (!UserManager.setCurrentChannel(playerEntity, channel)) {
-            throw new CommandException(new StringTextComponent(TextFormatting.RED + "Unable to find channel."));
+            throw new CommandException(new StringTextComponent(TextFormatting.RED + "Unable to find channel "
+                    + TextFormatting.BOLD + "#" + channel + TextFormatting.RESET + "" + TextFormatting.RED + "."));
         }
 
         return new StringTextComponent(TextFormatting.GREEN + "Switched to " + TextFormatting.BLUE + "#" + channel

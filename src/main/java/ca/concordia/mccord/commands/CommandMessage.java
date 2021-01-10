@@ -19,7 +19,7 @@ public class CommandMessage extends Command {
     protected LiteralArgumentBuilder<CommandSource> parser() {
         return Commands.literal(COMMAND_PREFIX)
                 .then(Commands.literal("msg")
-                        .then(Commands.argument("channel", StringArgumentType.word())
+                        .then(Commands.argument("channel", StringArgumentType.word()).suggests(Command.CHANNEL_SUGGEST)
                                 .then(Commands.argument("message", StringArgumentType.greedyString())
                                         .executes(commandContext -> execute(commandContext)))));
     }
@@ -33,9 +33,11 @@ public class CommandMessage extends Command {
 
         try {
             ChatManager.discordChannelMessage(player, channel, message);
-        } catch(AuthenticationException e) {
-            throw new CommandException(new StringTextComponent(TextFormatting.RED + "Unable to send message to channel."));
-        } catch(Exception e) {
+        } catch (AuthenticationException e) {
+            throw new CommandException(
+                    new StringTextComponent(TextFormatting.RED + "Invalid credentials to send message to Discord. "
+                            + "Make sure your account is linked and you have the privilidges."));
+        } catch (Exception e) {
             throw new CommandException(new StringTextComponent(TextFormatting.RED + "Unable to send message."));
         }
 
