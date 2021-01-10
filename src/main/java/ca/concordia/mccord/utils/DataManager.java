@@ -1,18 +1,32 @@
 package ca.concordia.mccord.utils;
 
+import java.io.File;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import ca.concordia.mccord.Config;
+import ca.concordia.mccord.Resources;
 import net.dv8tion.jda.api.entities.User;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
+import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
 
+@Mod.EventBusSubscriber(modid = Resources.MOD_ID, bus = Bus.FORGE)
 public class DataManager implements INBTSerializable<CompoundNBT> {
     private static final String PLAYER_DATA = "playerData";
     private static CompoundNBT playerDataNBT = new CompoundNBT();
     private static final String DISCORD_MAPPING = "discordUUID";
     private static CompoundNBT discordMappingNBT = new CompoundNBT();
+
+    @SubscribeEvent
+    public static void onServerStarted(FMLServerStartedEvent event) {
+        loadUserData();
+    }
 
     public static boolean containsUser(User user) {
         return containsUserDiscord(user.getId());
@@ -84,20 +98,47 @@ public class DataManager implements INBTSerializable<CompoundNBT> {
         }
 
         playerDataNBT.put(mcUUID, userData.serializeNBT());
+
+        // TODO: Better saving?
+        saveUserData();
     }
 
-    /**
-     * TODO: Load data externally.
-     */
     private static void loadUserData() {
+        File file = new File(Config.DATA_LOCATION.get());
 
+        if (!file.exists()) {
+            return;
+        }
+
+        try {
+            CompoundNBT nbt = CompressedStreamTools.read(file);
+
+            sDeserializeNBT(nbt);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    /**
-     * TODO: Save data externally.
-     */
     private static void saveUserData() {
-        
+        File file = new File(Config.DATA_LOCATION.get());
+
+        try {
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+
+            CompressedStreamTools.write(sSerializeNBT(), file);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void sDeserializeNBT(CompoundNBT nbt) {
+        new DataManager().deserializeNBT(nbt);
+    }
+
+    public static CompoundNBT sSerializeNBT() {
+        return new DataManager().serializeNBT();
     }
 
     @Override

@@ -29,6 +29,7 @@ public class Config {
     public static void buildGeneralConfig(ForgeConfigSpec.Builder builder) {
         builder.comment("General Settings").push(CATEGORY_GENERAL);
 
+        // TODO: Better save location.
         DATA_LOCATION = builder.comment("MCCord NBT Data Location").define("dataLocation", "./data/mccord.dat");
 
         builder.pop();
