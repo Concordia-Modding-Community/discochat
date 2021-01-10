@@ -7,8 +7,11 @@ import java.util.UUID;
 import ca.concordia.mccord.discord.DiscordManager;
 import ca.concordia.mccord.world.ServerManager;
 import net.dv8tion.jda.api.entities.User;
+import net.minecraft.command.CommandException;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
 
 public class UserManager {
     private static final String DEFAULT_CHANNEL = "general";
@@ -17,26 +20,27 @@ public class UserManager {
     private static HashMap<String, String> MC_DISCORD_MAP = new HashMap<String, String>();
     private static HashMap<String, String> USER_CHANNEL = new HashMap<String, String>();
 
-    private static boolean insertUUID(String discordUUID, String mcUUID) {
+    private static void insertUUID(String discordUUID, String mcUUID) throws CommandException {
+        if (DISCORD_MC_MAP.containsKey(discordUUID) || MC_DISCORD_MAP.containsKey(mcUUID)) {
+            throw new CommandException(new StringTextComponent(TextFormatting.RED + "Account(s) already linked."));
+        }
+
         DISCORD_MC_MAP.put(discordUUID, mcUUID);
         MC_DISCORD_MAP.put(mcUUID, discordUUID);
-
-        return true;
     }
 
-    public static boolean linkUsers(String discordUUID, String mcUUID) {
-        return insertUUID(discordUUID, mcUUID);
+    public static void linkUsers(String discordUUID, String mcUUID) throws CommandException {
+        insertUUID(discordUUID, mcUUID);
     }
 
-    public static boolean linkUsers(Optional<ServerPlayerEntity> player, Optional<User> user) {
-        try {
-            String mcUUID = player.get().getUniqueID().toString();
-            String discordUUID = user.get().getId();
+    public static void linkUsers(Optional<ServerPlayerEntity> player, Optional<User> user) throws CommandException {
+        String mcUUID = player.orElseThrow(
+                () -> new CommandException(new StringTextComponent(TextFormatting.RED + "Cannot find MC Account.")))
+                .getUniqueID().toString();
+        String discordUUID = user.orElseThrow(() -> new CommandException(
+                new StringTextComponent(TextFormatting.RED + "Cannot find Discord Account."))).getId();
 
-            return linkUsers(discordUUID, mcUUID);
-        } catch (Exception e) {
-            return false;
-        }
+        linkUsers(discordUUID, mcUUID);
     }
 
     public static Optional<ServerPlayerEntity> getMCPlayer(String discordUUID) {

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class DiscordCommands {
-    private static final Command[] COMMANDS = new Command[] { new CommandJoin() };
+    private static final Command[] COMMANDS = new Command[] { new CommandLink() };
 
     private static HashMap<String, Command> COMMAND_MAPPING = new HashMap<String, Command>();
 

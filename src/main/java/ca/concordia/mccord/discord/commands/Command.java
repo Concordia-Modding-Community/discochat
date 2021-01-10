@@ -5,12 +5,13 @@ import java.util.List;
 
 import ca.concordia.mccord.utils.StringUtils;
 import net.dv8tion.jda.api.entities.Message;
+import net.minecraft.util.text.ITextComponent;
 
 public abstract class Command {
     public static String COMMAND_PREFIX = "!";
 
     protected abstract String commandKey();
-    public abstract void execute(Message message);
+    public abstract ITextComponent execute(Message message) throws Exception;
 
     public static boolean isCommand(String message) {
         return message.startsWith(COMMAND_PREFIX);

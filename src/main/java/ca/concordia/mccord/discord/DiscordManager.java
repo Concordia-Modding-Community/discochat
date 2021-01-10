@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.minecraft.command.CommandException;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -119,11 +120,17 @@ public class DiscordManager extends ListenerAdapter {
             List<String> tokens = StringUtils.tokenize(message.getContentRaw());
 
             Command command = DiscordCommands.getCommand(tokens).orElseThrow(
-                    () -> new CommandException(new StringTextComponent("Unknown command " + tokens.get(0))));
+                    () -> new CommandException(new StringTextComponent("Unknown command `" + tokens.get(0) + "`.")));
 
-            command.execute(message);
+            ITextComponent text = command.execute(message);
+
+            if (text != null) {
+                message.getChannel().sendMessage(text.getString()).queue();
+            }
         } catch (CommandException e) {
-            message.getChannel().sendMessage(e.getMessage()).queue();
+            message.getChannel().sendMessage(e.getComponent().getString()).queue();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -136,7 +143,7 @@ public class DiscordManager extends ListenerAdapter {
         try {
             ChatManager.broadcastMC(message);
         } catch(Exception e) {
-            message.getChannel().sendMessage("Unable to send message to Minecraft.").queue();
+            message.getChannel().sendMessage("Unable to send message to MC.").queue();
         }
     }
 
