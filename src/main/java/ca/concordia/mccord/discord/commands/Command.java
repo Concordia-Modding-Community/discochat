@@ -1,34 +1,60 @@
 package ca.concordia.mccord.discord.commands;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.function.Function;
 
-import ca.concordia.mccord.utils.StringUtils;
-import net.dv8tion.jda.api.entities.Message;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.context.CommandContext;
+
+import ca.concordia.b4dis.CommandSourceDiscord;
+import ca.concordia.b4dis.DiscordBrigadier;
+import ca.concordia.mccord.utils.ICommand;
+import net.minecraft.command.CommandException;
 import net.minecraft.util.text.ITextComponent;
 
-public abstract class Command {
-    public static String COMMAND_PREFIX = "!";
-
-    protected abstract String commandKey();
-    public abstract ITextComponent execute(Message message) throws Exception;
-
-    public static boolean isCommand(String message) {
-        return message.startsWith(COMMAND_PREFIX);
+public abstract class Command implements ICommand<CommandSourceDiscord, ITextComponent> {
+    @Override
+    public void register(CommandDispatcher<CommandSourceDiscord> dispatcher) {
+        dispatcher.register(getParser());
     }
 
     /**
-     * Returns argument list from message.
-     * @param message Message to parse.
-     * @return List of arguments.
+     * TODO: Code dupe with {@link ca.concordia.mccord.commands.Command#execute(CommandContext, Function)}.
      */
-    protected static List<String> getArguments(String message) {
-        List<String> tokens = StringUtils.tokenize(message);
+    @Override
+    public int execute(CommandContext<CommandSourceDiscord> commandContext,
+            Function<CommandContext<CommandSourceDiscord>, ITextComponent> function) {
+        try {
+            ITextComponent text = function.apply(commandContext);
 
-        if(tokens.size() < 1) {
-            return new ArrayList<String>();
+            if (text != null) {
+                sendFeedback(commandContext, text);
+            }
+
+            return DiscordBrigadier.SUCCESS;
+        } catch (CommandException e) {
+            sendErrorMessage(commandContext, e.getComponent());
+
+            return DiscordBrigadier.FAIL;
+        } catch (Exception e) {
+            return DiscordBrigadier.FAIL;
         }
+    }
 
-        return tokens.subList(1, tokens.size());
+    /**
+     * TODO: Code dupe with {@link #sendErrorMessage(CommandContext, ITextComponent)}.
+     * @param commandContext
+     * @param text
+     */
+    protected void sendFeedback(CommandContext<CommandSourceDiscord> commandContext, ITextComponent text) {
+        commandContext.getSource().getChannel().get().sendMessage(text.getString()).queue();
+    }
+
+    /**
+     * TODO: Code dupe with {@link #sendFeedback(CommandContext, ITextComponent)}.
+     * @param commandContext
+     * @param text
+     */
+    protected void sendErrorMessage(CommandContext<CommandSourceDiscord> commandContext, ITextComponent text) {
+        commandContext.getSource().getChannel().get().sendMessage(text.getString()).queue();
     }
 }

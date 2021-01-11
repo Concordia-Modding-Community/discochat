@@ -16,54 +16,52 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 
 public class CommandLink extends Command {
-    @Override
-    protected LiteralArgumentBuilder<CommandSource> parser() {
-        return Commands.literal(COMMAND_PREFIX)
-                .then(Commands.literal("link")
-                        .then(Commands.argument("username", StringArgumentType.word())
-                                .then(Commands.argument("discriminator", IntegerArgumentType.integer(0, 10000))
-                                        .executes(commandContext -> execute(commandContext))))
-                        .then(Commands.argument("discordUUID", StringArgumentType.word())
-                                .executes(commandContext -> execute(commandContext, context -> uuidExecute(context)))));
-    }
+        @Override
+        public LiteralArgumentBuilder<CommandSource> getParser() {
+                return Commands.literal("link").then(Commands.argument("username", StringArgumentType.word()).then(
+                                Commands.argument("discriminator", IntegerArgumentType.integer(0, 10000)).executes(
+                                                commandContext -> execute(commandContext, this::defaultExecute))))
+                                .then(Commands.argument("discordUUID", StringArgumentType.word()).executes(
+                                                commandContext -> execute(commandContext, this::uuidExecute)));
+        }
 
-    private ITextComponent commonExecute(CommandContext<CommandSource> commandContext, User user) throws CommandException {
-        PlayerEntity playerEntity = getSourcePlayer(commandContext).get();
+        private ITextComponent commonExecute(CommandContext<CommandSource> commandContext, User user)
+                        throws CommandException {
+                PlayerEntity playerEntity = getSourcePlayer(commandContext).get();
 
-        String mcUUID = playerEntity.getUniqueID().toString();
+                String mcUUID = playerEntity.getUniqueID().toString();
 
-        String discordUUID = user.getId();
+                String discordUUID = user.getId();
 
-        UserManager.link(mcUUID, discordUUID);
+                UserManager.link(mcUUID, discordUUID);
 
-        user.openPrivateChannel()
-                .flatMap(
-                        channel -> channel.sendMessage("MC Account `" + playerEntity.getName().getString() + "` Linked."))
-                .queue();
+                user.openPrivateChannel()
+                                .flatMap(channel -> channel.sendMessage(
+                                                "MC Account `" + playerEntity.getName().getString() + "` Linked."))
+                                .queue();
 
-        return new StringTextComponent(TextFormatting.GREEN + "Discord Account Linked.");
-    }
+                return new StringTextComponent(TextFormatting.GREEN + "Discord Account Linked.");
+        }
 
-    @Override
-    protected ITextComponent defaultExecute(CommandContext<CommandSource> commandContext) throws CommandException {
-        String username = StringArgumentType.getString(commandContext, "username");
+        protected ITextComponent defaultExecute(CommandContext<CommandSource> commandContext) throws CommandException {
+                String username = StringArgumentType.getString(commandContext, "username");
 
-        int intDiscriminator = IntegerArgumentType.getInteger(commandContext, "discriminator");
+                int intDiscriminator = IntegerArgumentType.getInteger(commandContext, "discriminator");
 
-        String discriminator = String.format("%04d", intDiscriminator);
+                String discriminator = String.format("%04d", intDiscriminator);
 
-        User user = UserManager.fromDiscordTag(username, discriminator).orElseThrow(() -> new CommandException(
-                new StringTextComponent(TextFormatting.RED + "Unable to find Discord account.")));
+                User user = UserManager.fromDiscordTag(username, discriminator).orElseThrow(() -> new CommandException(
+                                new StringTextComponent(TextFormatting.RED + "Unable to find Discord account.")));
 
-        return commonExecute(commandContext, user);
-    }
+                return commonExecute(commandContext, user);
+        }
 
-    protected ITextComponent uuidExecute(CommandContext<CommandSource> commandContext) throws CommandException {
-        String uuid = StringArgumentType.getString(commandContext, "discordUUID");
+        protected ITextComponent uuidExecute(CommandContext<CommandSource> commandContext) throws CommandException {
+                String uuid = StringArgumentType.getString(commandContext, "discordUUID");
 
-        User user = UserManager.fromDiscordUUID(uuid).orElseThrow(() -> new CommandException(
-                new StringTextComponent(TextFormatting.RED + "Unable to find Discord account.")));
+                User user = UserManager.fromDiscordUUID(uuid).orElseThrow(() -> new CommandException(
+                                new StringTextComponent(TextFormatting.RED + "Unable to find Discord account.")));
 
-        return commonExecute(commandContext, user);
-    }
+                return commonExecute(commandContext, user);
+        }
 }

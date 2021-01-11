@@ -1,21 +1,17 @@
 package ca.concordia.mccord.commands;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.suggestion.SuggestionProvider;
 
+import ca.concordia.mccord.Config;
 import ca.concordia.mccord.entity.MCCordUser;
-import net.dv8tion.jda.api.entities.TextChannel;
+import ca.concordia.mccord.utils.ICommand;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandSource;
-import net.minecraft.command.ISuggestionProvider;
+import net.minecraft.command.Commands;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.Util;
@@ -24,45 +20,33 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 
-public abstract class Command {
-    public static final SuggestionProvider<CommandSource> ACCESSIBLE_CHANNEL_SUGGEST = (context, builder) -> {
-        List<String> channels = new ArrayList<String>();
-
-        try {
-            List<TextChannel> textChannels = MCCordUser.fromMCPlayerEntity(context.getSource().asPlayer()).get()
-                    .getAccessibleChannels();
-
-            channels = textChannels.stream().map(channel -> channel.getName()).collect(Collectors.toList());
-        } catch (Exception e) {
-        }
-
-        return ISuggestionProvider.suggest(channels.toArray(new String[0]), builder);
-    };
-
-    // TODO: Prevent code duplicate.
-    public static final SuggestionProvider<CommandSource> VISIBLE_CHANNEL_SUGGEST = (context, builder) -> {
-        List<String> channels = new ArrayList<String>();
-
-        try {
-            List<TextChannel> textChannels = MCCordUser.fromMCPlayerEntity(context.getSource().asPlayer()).get()
-                    .getVisibleChannels();
-
-            channels = textChannels.stream().map(channel -> channel.getName()).collect(Collectors.toList());
-        } catch (Exception e) {
-        }
-
-        return ISuggestionProvider.suggest(channels.toArray(new String[0]), builder);
-    };
-
-    public static String COMMAND_PREFIX = "discord";
-
-    protected abstract LiteralArgumentBuilder<CommandSource> parser();
-
-    protected abstract ITextComponent defaultExecute(CommandContext<CommandSource> commandContext)
-            throws CommandException;
-
+public abstract class Command implements ICommand<CommandSource, ITextComponent> {
+    @Override
     public void register(CommandDispatcher<CommandSource> dispatcher) {
-        dispatcher.register(this.parser());
+        dispatcher.register(Commands.literal(Config.MC_COMMAND_PREFIX.get()).then(getParser()));
+    }
+
+    /**
+     * TODO: Code dupe with {@link ca.concordia.mccord.discord.commands.Command#execute(CommandContext, Function)}.
+     */
+    @Override
+    public int execute(CommandContext<CommandSource> commandContext,
+            Function<CommandContext<CommandSource>, ITextComponent> function) {
+        try {
+            ITextComponent text = function.apply(commandContext);
+
+            if (text != null) {
+                sendFeedback(commandContext, text);
+            }
+
+            return 1;
+        } catch (CommandException e) {
+            sendErrorMessage(commandContext, e.getComponent());
+
+            return 0;
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     /**
@@ -111,28 +95,5 @@ public abstract class Command {
         }
 
         return Optional.of((ServerPlayerEntity) entity);
-    }
-
-    protected int execute(CommandContext<CommandSource> commandContext) {
-        return execute(commandContext, (context) -> defaultExecute(context));
-    }
-
-    protected int execute(CommandContext<CommandSource> commandContext,
-            Function<CommandContext<CommandSource>, ITextComponent> function) {
-        try {
-            ITextComponent text = function.apply(commandContext);
-
-            if (text != null) {
-                sendFeedback(commandContext, text);
-            }
-
-            return 1;
-        } catch (CommandException e) {
-            sendErrorMessage(commandContext, e.getComponent());
-
-            return 0;
-        } catch (Exception e) {
-            return 0;
-        }
     }
 }

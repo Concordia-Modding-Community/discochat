@@ -13,12 +13,11 @@ import net.minecraft.util.text.TextFormatting;
 
 public class CommandStop extends Command {
     @Override
-    protected LiteralArgumentBuilder<CommandSource> parser() {
-        return Commands.literal(COMMAND_PREFIX).then(Commands.literal("stop")
-                .requires(command -> command.hasPermissionLevel(3)).executes(command -> execute(command)));
+    public LiteralArgumentBuilder<CommandSource> getParser() {
+        return Commands.literal("stop").requires(command -> command.hasPermissionLevel(3))
+                .executes(context -> execute(context, this::defaultExecute));
     }
 
-    @Override
     protected ITextComponent defaultExecute(CommandContext<CommandSource> commandContext) throws CommandException {
         DiscordManager.disconnect();
 

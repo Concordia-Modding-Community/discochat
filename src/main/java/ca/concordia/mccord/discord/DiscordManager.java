@@ -4,34 +4,32 @@ import java.util.List;
 import java.util.Optional;
 
 import ca.concordia.mccord.Config;
-import ca.concordia.mccord.MCCord;
 import ca.concordia.mccord.chat.ChatManager;
-import ca.concordia.mccord.discord.commands.Command;
-import ca.concordia.mccord.discord.commands.DiscordCommands;
-import ca.concordia.mccord.utils.StringUtils;
+import ca.concordia.mccord.discord.commands.DiscordCommandManager;
+import ca.concordia.b4dis.DiscordBrigadier;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.minecraft.command.CommandException;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+
 /**
  * A wrapper around JDA.
  */
-public class DiscordManager extends ListenerAdapter {
+public class DiscordManager {
     private static Optional<JDA> jda = Optional.empty();
+    private static DiscordBrigadier discordBrigadier = new DiscordBrigadier(() -> Config.DISCORD_COMMAND_PREFIX.get(),
+            message -> handleMessage(message));
 
     public static void register() {
-        DiscordManager.connect(Config.DISCORD_API_KEY.get());
+        connect(Config.DISCORD_API_KEY.get());
+
+        DiscordCommandManager.register(discordBrigadier.getDispatcher());
     }
 
     public static void unregister() {
-        DiscordManager.disconnect();
+        disconnect();
     }
 
     /**
@@ -52,14 +50,12 @@ public class DiscordManager extends ListenerAdapter {
 
             JDA tJDA = JDABuilder.createDefault(token).build();
 
-            tJDA.addEventListener(new DiscordManager());
+            tJDA.addEventListener(discordBrigadier);
 
             tJDA.awaitReady();
 
             jda = Optional.ofNullable(tJDA);
         } catch (Exception e) {
-            MCCord.LOGGER.error(e.getMessage());
-
             return false;
         }
 
@@ -84,45 +80,7 @@ public class DiscordManager extends ListenerAdapter {
             jda.get().shutdown();
 
             jda = Optional.empty();
-        } catch (Exception e) {}
-    }
-
-    @Override
-    public void onMessageReceived(MessageReceivedEvent event) {
-        if (event.getAuthor().isBot()) {
-            return;
-        }
-
-        final Message message = event.getMessage();
-
-        if (Command.isCommand(message.getContentRaw())) {
-            handleCommand(message);
-        } else {
-            handleMessage(message);
-        }
-    }
-
-    /**
-     * Handles a command message to the Discord bot.
-     * 
-     * @param message Message to handle.
-     */
-    private void handleCommand(Message message) {
-        try {
-            List<String> tokens = StringUtils.tokenize(message.getContentRaw());
-
-            Command command = DiscordCommands.getCommand(tokens).orElseThrow(
-                    () -> new CommandException(new StringTextComponent("Unknown command `" + tokens.get(0) + "`.")));
-
-            ITextComponent text = command.execute(message);
-
-            if (text != null) {
-                message.getChannel().sendMessage(text.getString()).queue();
-            }
-        } catch (CommandException e) {
-            message.getChannel().sendMessage(e.getComponent().getString()).queue();
         } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -131,10 +89,10 @@ public class DiscordManager extends ListenerAdapter {
      * 
      * @param message Message to handle.
      */
-    private void handleMessage(Message message) {
+    private static void handleMessage(Message message) {
         try {
             ChatManager.broadcastMC(message);
-        } catch(Exception e) {
+        } catch (Exception e) {
             message.getChannel().sendMessage("Unable to send message to MC.").queue();
         }
     }
@@ -145,7 +103,7 @@ public class DiscordManager extends ListenerAdapter {
     public static Optional<List<TextChannel>> getChannels() {
         try {
             return Optional.ofNullable(jda.get().getTextChannels());
-        } catch(Exception e) {
+        } catch (Exception e) {
             return Optional.empty();
         }
     }
@@ -160,7 +118,7 @@ public class DiscordManager extends ListenerAdapter {
             List<TextChannel> channels = jda.get().getTextChannelsByName(name, true);
 
             return Optional.ofNullable(channels.get(0));
-        } catch(Exception e) {
+        } catch (Exception e) {
             return Optional.empty();
         }
     }
@@ -168,7 +126,7 @@ public class DiscordManager extends ListenerAdapter {
     public static Optional<User> getUserFromUUID(String uuid) {
         try {
             return Optional.ofNullable(jda.get().retrieveUserById(uuid).complete());
-        } catch(Exception e) {
+        } catch (Exception e) {
             return Optional.empty();
         }
     }
@@ -176,7 +134,7 @@ public class DiscordManager extends ListenerAdapter {
     public static Optional<User> getUserByTag(String tag) {
         try {
             return Optional.ofNullable(jda.get().getUserByTag(tag));
-        } catch(Exception e) {
+        } catch (Exception e) {
             return Optional.empty();
         }
     }
@@ -184,7 +142,7 @@ public class DiscordManager extends ListenerAdapter {
     public static Optional<User> getUserByTag(String username, String discriminator) {
         try {
             return Optional.ofNullable(jda.get().getUserByTag(username, discriminator));
-        } catch(Exception e) {
+        } catch (Exception e) {
             return Optional.empty();
         }
     }

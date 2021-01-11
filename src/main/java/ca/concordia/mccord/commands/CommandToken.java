@@ -14,13 +14,12 @@ import net.minecraft.util.text.TextFormatting;
 
 public class CommandToken extends Command {
     @Override
-    protected LiteralArgumentBuilder<CommandSource> parser() {
-        return Commands.literal(COMMAND_PREFIX)
-                .then(Commands.literal("token").requires(command -> command.hasPermissionLevel(3))
-                        .then(Commands.argument("key", StringArgumentType.string()).executes(command -> execute(command))));
+    public LiteralArgumentBuilder<CommandSource> getParser() {
+        return Commands.literal("token").requires(command -> command.hasPermissionLevel(3))
+                .then(Commands.argument("key", StringArgumentType.string())
+                        .executes(context -> execute(context, this::defaultExecute)));
     }
 
-    @Override
     protected ITextComponent defaultExecute(CommandContext<CommandSource> commandContext) throws CommandException {
         String key = StringArgumentType.getString(commandContext, "key");
 

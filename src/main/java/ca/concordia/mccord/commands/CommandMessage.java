@@ -16,15 +16,14 @@ import net.minecraft.util.text.TextFormatting;
 
 public class CommandMessage extends Command {
     @Override
-    protected LiteralArgumentBuilder<CommandSource> parser() {
-        return Commands.literal(COMMAND_PREFIX)
-                .then(Commands.literal("msg")
-                        .then(Commands.argument("channel", StringArgumentType.word()).suggests(Command.ACCESSIBLE_CHANNEL_SUGGEST)
-                                .then(Commands.argument("message", StringArgumentType.greedyString())
-                                        .executes(commandContext -> execute(commandContext)))));
+    public LiteralArgumentBuilder<CommandSource> getParser() {
+        return Commands.literal("msg")
+                .then(Commands.argument("channel", StringArgumentType.word())
+                        .suggests(CommandSuggestions.ACCESSIBLE_CHANNEL_SUGGEST)
+                        .then(Commands.argument("message", StringArgumentType.greedyString())
+                                .executes(context -> execute(context, this::defaultExecute))));
     }
 
-    @Override
     protected ITextComponent defaultExecute(CommandContext<CommandSource> commandContext) throws CommandException {
         ServerPlayerEntity player = getSourcePlayer(commandContext).get();
 
@@ -44,5 +43,4 @@ public class CommandMessage extends Command {
 
         return null;
     }
-
 }

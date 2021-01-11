@@ -14,13 +14,13 @@ import net.minecraft.util.text.TextFormatting;
 
 public class CommandSwitch extends Command {
     @Override
-    protected LiteralArgumentBuilder<CommandSource> parser() {
-        return Commands.literal(COMMAND_PREFIX)
-                .then(Commands.literal("switch").then(Commands.argument("channel", StringArgumentType.word())
-                        .suggests(Command.VISIBLE_CHANNEL_SUGGEST).executes(commandContext -> execute(commandContext))));
+    public LiteralArgumentBuilder<CommandSource> getParser() {
+        return Commands.literal("switch")
+                .then(Commands.argument("channel", StringArgumentType.word())
+                        .suggests(CommandSuggestions.VISIBLE_CHANNEL_SUGGEST)
+                        .executes(context -> execute(context, this::defaultExecute)));
     }
 
-    @Override
     protected ITextComponent defaultExecute(CommandContext<CommandSource> commandContext) throws CommandException {
         String channel = StringArgumentType.getString(commandContext, "channel");
 

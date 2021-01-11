@@ -14,12 +14,11 @@ import net.minecraft.util.text.TextFormatting;
 
 public class CommandStart extends Command {
     @Override
-    protected LiteralArgumentBuilder<CommandSource> parser() {
-        return Commands.literal(COMMAND_PREFIX).then(Commands.literal("start")
-                .requires(command -> command.hasPermissionLevel(3)).executes(command -> execute(command)));
+    public LiteralArgumentBuilder<CommandSource> getParser() {
+        return Commands.literal("start").requires(command -> command.hasPermissionLevel(3))
+                .executes(context -> execute(context, this::defaultExecute));
     }
 
-    @Override
     protected ITextComponent defaultExecute(CommandContext<CommandSource> commandContext) throws CommandException {
         if (DiscordManager.isConnected()) {
             throw new CommandException(new StringTextComponent(TextFormatting.RED + "Discord already connected."));

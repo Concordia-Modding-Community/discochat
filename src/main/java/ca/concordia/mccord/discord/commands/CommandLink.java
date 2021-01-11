@@ -1,9 +1,13 @@
 package ca.concordia.mccord.discord.commands;
 
-import java.util.List;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
 
+import ca.concordia.b4dis.CommandSourceDiscord;
+import ca.concordia.b4dis.DiscordBrigadier;
 import ca.concordia.mccord.entity.UserManager;
-import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
 import net.minecraft.command.CommandException;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.text.ITextComponent;
@@ -12,29 +16,29 @@ import net.minecraft.util.text.TextFormatting;
 
 public class CommandLink extends Command {
     @Override
-    protected String commandKey() {
-        return "link";
+    public LiteralArgumentBuilder<CommandSourceDiscord> getParser() {
+        return DiscordBrigadier.literal("link").then(DiscordBrigadier.argument("player", StringArgumentType.word())
+                .executes(context -> execute(context, this::defaultExecute)));
     }
 
-    @Override
-    public ITextComponent execute(Message message) throws Exception {
-        List<String> arguments = getArguments(message.getContentRaw());
-
-        String minecraftName = arguments.get(0);
+    public ITextComponent defaultExecute(CommandContext<CommandSourceDiscord> context) throws CommandException {
+        String minecraftName = StringArgumentType.getString(context, "player");
 
         PlayerEntity playerEntity = UserManager.fromMCName(minecraftName)
                 .orElseThrow(() -> new CommandException(new StringTextComponent("Unable to find MC username.")));
 
-        String discordUUID = message.getAuthor().getId();
+        User author = context.getSource().getUser();
+
+        String discordUUID = author.getId();
 
         String mcUUID = playerEntity.getUniqueID().toString();
 
-        ITextComponent text = new StringTextComponent("Discord Account " + TextFormatting.BLUE + "@"
-                + message.getAuthor().getAsTag() + TextFormatting.RESET + " Linked.");
+        UserManager.link(mcUUID, discordUUID);
+
+        ITextComponent text = new StringTextComponent(
+                "Discord Account " + TextFormatting.BLUE + "@" + author.getAsTag() + TextFormatting.RESET + " Linked.");
 
         playerEntity.sendStatusMessage(text, false);
-
-        UserManager.link(mcUUID, discordUUID);
 
         return new StringTextComponent("MC Account Linked.");
     }
