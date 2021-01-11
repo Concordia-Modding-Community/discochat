@@ -78,6 +78,15 @@ public class DiscordBrigadier extends ListenerAdapter {
     }
 
     /**
+     * Gets raw command dispatcher.
+     * 
+     * @return Command dispatcher.
+     */
+    public CommandDispatcher<CommandSourceDiscord> getDispatcher() {
+        return dispatcher;
+    }
+
+    /**
      * Discord message received listener. Blocks bots from issuing commands.
      * Offloads Discord message to {@link #handleCommand} or {@link #handleMessage}
      * according to the message contents.
@@ -259,7 +268,8 @@ public class DiscordBrigadier extends ListenerAdapter {
      * @param name Argument name.
      * @param type Argument type.
      * @return Argument.
-     * @see com.mojang.brigadier.builder.RequiredArgumentBuilder#argument(String, ArgumentType)
+     * @see com.mojang.brigadier.builder.RequiredArgumentBuilder#argument(String,
+     *      ArgumentType)
      */
     public static <T> RequiredArgumentBuilder<CommandSourceDiscord, T> argument(String name, ArgumentType<T> type) {
         return RequiredArgumentBuilder.argument(name, type);
