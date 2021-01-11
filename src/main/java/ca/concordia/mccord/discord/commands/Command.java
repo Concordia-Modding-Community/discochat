@@ -30,13 +30,13 @@ public abstract class Command implements ICommand<CommandSourceDiscord, ITextCom
                 sendFeedback(commandContext, text);
             }
 
-            return DiscordBrigadier.SUCCESS;
+            return 1;
         } catch (CommandException e) {
             sendErrorMessage(commandContext, e.getComponent());
 
-            return DiscordBrigadier.FAIL;
+            return 0;
         } catch (Exception e) {
-            return DiscordBrigadier.FAIL;
+            return 0;
         }
     }
 
