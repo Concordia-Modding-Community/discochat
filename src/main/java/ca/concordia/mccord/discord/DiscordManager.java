@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import ca.concordia.mccord.Config;
+import ca.concordia.mccord.MCCord;
 import ca.concordia.mccord.chat.ChatManager;
 import ca.concordia.mccord.discord.commands.DiscordCommandManager;
 import ca.concordia.b4dis.DiscordBrigadier;
@@ -90,6 +91,8 @@ public class DiscordManager {
      * @param message Message to handle.
      */
     private static void handleMessage(Message message) {
+        MCCord.LOGGER.error(message.getContentRaw());
+
         try {
             ChatManager.broadcastMC(message);
         } catch (Exception e) {

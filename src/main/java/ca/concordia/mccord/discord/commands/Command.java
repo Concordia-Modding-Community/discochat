@@ -6,7 +6,6 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 
 import ca.concordia.b4dis.CommandSourceDiscord;
-import ca.concordia.b4dis.DiscordBrigadier;
 import ca.concordia.mccord.utils.ICommand;
 import net.minecraft.command.CommandException;
 import net.minecraft.util.text.ITextComponent;
