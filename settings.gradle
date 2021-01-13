@@ -1,0 +1,7 @@
+rootProject.name = 'mccord'
+
+include 'b4dis'
+include 'jddown'
+
+project(':b4dis').projectDir = "projects/b4dis" as File
+project(':jddown').projectDir = "projects/jddown" as File
