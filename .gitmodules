@@ -1,0 +1,6 @@
+[submodule "projects/jddown"]
+	path = projects/jddown
+	url = https://github.com/Concordia-Modding-Community/jddown.git
+[submodule "projects/b4dis"]
+	path = projects/b4dis
+	url = https://github.com/Concordia-Modding-Community/b4dis.git
