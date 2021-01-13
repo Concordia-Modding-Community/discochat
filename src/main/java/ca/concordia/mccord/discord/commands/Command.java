@@ -45,7 +45,7 @@ public abstract class Command implements ICommand<CommandSourceDiscord, ITextCom
      * @param text
      */
     protected void sendFeedback(CommandContext<CommandSourceDiscord> commandContext, ITextComponent text) {
-        commandContext.getSource().getChannel().get().sendMessage(text.getString()).queue();
+        commandContext.getSource().getTextChannel().sendMessage(text.getString()).queue();
     }
 
     /**
@@ -54,6 +54,6 @@ public abstract class Command implements ICommand<CommandSourceDiscord, ITextCom
      * @param text
      */
     protected void sendErrorMessage(CommandContext<CommandSourceDiscord> commandContext, ITextComponent text) {
-        commandContext.getSource().getChannel().get().sendMessage(text.getString()).queue();
+        commandContext.getSource().getTextChannel().sendMessage(text.getString()).queue();
     }
 }
