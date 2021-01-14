@@ -5,7 +5,6 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 
-import ca.concordia.mccord.chat.ChatManager;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
@@ -18,8 +17,8 @@ public class CommandMessage extends Command {
     @Override
     public LiteralArgumentBuilder<CommandSource> getParser() {
         return Commands.literal("msg")
-                .then(Commands.argument("channel", StringArgumentType.word())
-                        .suggests(CommandSuggestions.ACCESSIBLE_CHANNEL_SUGGEST)
+                .then(Commands.argument("channel", StringArgumentType.word()).suggests(
+                        (context, builder) -> getMod().getCommandSuggestions().getAccessibleChannels(context, builder))
                         .then(Commands.argument("message", StringArgumentType.greedyString())
                                 .executes(context -> execute(context, this::defaultExecute))));
     }
@@ -32,7 +31,7 @@ public class CommandMessage extends Command {
         String message = StringArgumentType.getString(commandContext, "message");
 
         try {
-            ChatManager.broadcastDiscord(player, channel, message);
+            getMod().getChatManager().broadcastDiscord(player, channel, message);
         } catch (AuthenticationException e) {
             throw new CommandException(
                     new StringTextComponent(TextFormatting.RED + "Invalid credentials to send message to Discord. "

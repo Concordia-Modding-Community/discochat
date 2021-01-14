@@ -15,6 +15,7 @@ out
 
 # vscode
 .vscode
+logs
 
 # gradle
 build

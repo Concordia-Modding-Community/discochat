@@ -3,7 +3,6 @@ package ca.concordia.mccord.commands;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 
-import ca.concordia.mccord.discord.DiscordManager;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
@@ -19,7 +18,7 @@ public class CommandStop extends Command {
     }
 
     protected ITextComponent defaultExecute(CommandContext<CommandSource> commandContext) throws CommandException {
-        DiscordManager.disconnect();
+        getMod().getDiscordManager().disconnect();
 
         return new StringTextComponent(TextFormatting.GREEN + "Discord disconnected.");
     }

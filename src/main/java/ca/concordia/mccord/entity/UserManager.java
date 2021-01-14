@@ -3,10 +3,10 @@ package ca.concordia.mccord.entity;
 import java.util.Optional;
 import java.util.UUID;
 
-import ca.concordia.mccord.discord.DiscordManager;
 import ca.concordia.mccord.data.DataManager;
 import ca.concordia.mccord.data.UserData;
-import ca.concordia.mccord.server.ServerManager;
+import ca.concordia.mccord.utils.AbstractManager;
+import ca.concordia.mccord.utils.IMod;
 import net.dv8tion.jda.api.entities.User;
 import net.minecraft.command.CommandException;
 import net.minecraft.entity.player.PlayerEntity;
@@ -14,41 +14,46 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 
-public class UserManager {
-    public static Optional<ServerPlayerEntity> fromMCUUID(String uuid) {
+public class UserManager extends AbstractManager {
+    public UserManager(IMod mod) {
+        super(mod);
+    }
+
+    public Optional<ServerPlayerEntity> fromMCUUID(String uuid) {
         try {
-            return Optional
-                    .ofNullable(ServerManager.getServer().get().getPlayerList().getPlayerByUUID(UUID.fromString(uuid)));
+            return Optional.ofNullable(getMod().getServerManager().getServer().get().getPlayerList()
+                    .getPlayerByUUID(UUID.fromString(uuid)));
         } catch (Exception e) {
             return Optional.empty();
         }
     }
 
-    public static Optional<ServerPlayerEntity> fromMCName(String name) {
+    public Optional<ServerPlayerEntity> fromMCName(String name) {
         try {
-            return Optional.ofNullable(ServerManager.getServer().get().getPlayerList().getPlayerByUsername(name));
+            return Optional.ofNullable(
+                    getMod().getServerManager().getServer().get().getPlayerList().getPlayerByUsername(name));
         } catch (Exception e) {
             return Optional.empty();
         }
     }
 
-    public static Optional<User> fromDiscordUUID(String uuid) {
-        return DiscordManager.getUserFromUUID(uuid);
+    public Optional<User> fromDiscordUUID(String uuid) {
+        return getMod().getDiscordManager().getUserFromUUID(uuid);
     }
 
-    public static Optional<User> fromDiscordTag(String username, String discriminator) {
-        return DiscordManager.getUserByTag(username, discriminator);
+    public Optional<User> fromDiscordTag(String username, String discriminator) {
+        return getMod().getDiscordManager().getUserByTag(username, discriminator);
     }
 
-    public static Optional<User> fromDiscordTag(String tag) {
-        return DiscordManager.getUserByTag(tag);
+    public Optional<User> fromDiscordTag(String tag) {
+        return getMod().getDiscordManager().getUserByTag(tag);
     }
 
-    public static void link(ServerPlayerEntity playerEntity, User user) throws CommandException {
+    public void link(ServerPlayerEntity playerEntity, User user) throws CommandException {
         link(Optional.ofNullable(playerEntity), Optional.ofNullable(user));
     }
 
-    public static void link(Optional<ServerPlayerEntity> oPlayerEntity, Optional<User> user) throws CommandException {
+    public void link(Optional<ServerPlayerEntity> oPlayerEntity, Optional<User> user) throws CommandException {
         PlayerEntity playerEntity = oPlayerEntity.get();
 
         String mcUUID = playerEntity.getUniqueID().toString();
@@ -60,13 +65,13 @@ public class UserManager {
 
     /**
      */
-    public static void link(String mcUUID, String discordUUID) throws CommandException {
-        if (DataManager.containsUser(mcUUID, discordUUID)) {
+    public void link(String mcUUID, String discordUUID) throws CommandException {
+        if (getMod().getDataManager().containsUser(mcUUID, discordUUID)) {
             throw new CommandException(new StringTextComponent(TextFormatting.RED + "Account(s) already linked."));
         }
 
-        DataManager.setUserData(mcUUID, userData -> {
-            userData.discordUUID = discordUUID;
+        getMod().getDataManager().setUserData(mcUUID, userData -> {
+            userData.setDiscordUUID(discordUUID);
         });
     }
 
@@ -74,12 +79,12 @@ public class UserManager {
      * @param user
      * @return
      */
-    public static Optional<ServerPlayerEntity> getPlayerEntityFromDiscordUser(Optional<User> user) {
+    public Optional<ServerPlayerEntity> getPlayerEntityFromDiscordUser(User user) {
         try {
-            UserData userData = DataManager.getUserData(user.get()).get();
+            UserData userData = getMod().getDataManager().getUserData(user).get();
 
-            return Optional.ofNullable(
-                    ServerManager.getServer().get().getPlayerList().getPlayerByUUID(UUID.fromString(userData.mcUUID)));
+            return Optional.ofNullable(getMod().getServerManager().getServer().get().getPlayerList()
+                    .getPlayerByUUID(UUID.fromString(userData.getMCUUID())));
         } catch (Exception e) {
             e.printStackTrace();
 
@@ -91,15 +96,11 @@ public class UserManager {
      * @param playerEntity
      * @return
      */
-    public static Optional<User> getDiscordUserFromPlayerEntity(Optional<ServerPlayerEntity> playerEntity) {
-        try {
-            UserData userData = DataManager.getUserData(playerEntity.get()).get();
+    public Optional<User> getDiscordUserFromPlayerEntity(PlayerEntity playerEntity) {
+        DataManager dataManager = getMod().getDataManager();
 
-            return DiscordManager.getUserFromUUID(userData.discordUUID);
-        } catch (Exception e) {
-            e.printStackTrace();
+        UserData userData = dataManager.getUserData(playerEntity).get();
 
-            return Optional.empty();
-        }
+        return getMod().getDiscordManager().getUserFromUUID(userData.getDiscordUUID());
     }
 }

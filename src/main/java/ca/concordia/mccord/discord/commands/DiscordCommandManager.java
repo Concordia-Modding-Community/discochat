@@ -3,13 +3,21 @@ package ca.concordia.mccord.discord.commands;
 import com.mojang.brigadier.CommandDispatcher;
 
 import ca.concordia.b4dis.CommandSourceDiscord;
+import ca.concordia.mccord.utils.AbstractManager;
+import ca.concordia.mccord.utils.IMod;
 
-public class DiscordCommandManager {
+public class DiscordCommandManager extends AbstractManager {
     private static final Command[] COMMANDS = new Command[] { new CommandLink(), new CommandDefault() };
 
-    public static void register(CommandDispatcher<CommandSourceDiscord> dispatcher) {
+    public DiscordCommandManager(IMod mod) {
+        super(mod);
+    }
+
+    public DiscordCommandManager register(CommandDispatcher<CommandSourceDiscord> dispatcher) {
         for (Command command : COMMANDS) {
-            command.register(dispatcher);
+            command.register(getMod(), dispatcher);
         }
+
+        return this;
     }
 }

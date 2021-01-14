@@ -7,17 +7,27 @@ import com.mojang.brigadier.context.CommandContext;
 
 import ca.concordia.b4dis.CommandSourceDiscord;
 import ca.concordia.mccord.utils.ICommand;
+import ca.concordia.mccord.utils.IMod;
 import net.minecraft.command.CommandException;
 import net.minecraft.util.text.ITextComponent;
 
 public abstract class Command implements ICommand<CommandSourceDiscord, ITextComponent> {
+    private IMod mod;
+
     @Override
-    public void register(CommandDispatcher<CommandSourceDiscord> dispatcher) {
+    public void register(IMod mod, CommandDispatcher<CommandSourceDiscord> dispatcher) {
+        this.mod = mod;
         dispatcher.register(getParser());
     }
 
+    @Override
+    public IMod getMod() {
+        return mod;
+    }
+
     /**
-     * TODO: Code dupe with {@link ca.concordia.mccord.commands.Command#execute(CommandContext, Function)}.
+     * TODO: Code dupe with
+     * {@link ca.concordia.mccord.commands.Command#execute(CommandContext, Function)}.
      */
     @Override
     public int execute(CommandContext<CommandSourceDiscord> commandContext,
@@ -40,7 +50,9 @@ public abstract class Command implements ICommand<CommandSourceDiscord, ITextCom
     }
 
     /**
-     * TODO: Code dupe with {@link #sendErrorMessage(CommandContext, ITextComponent)}.
+     * TODO: Code dupe with
+     * {@link #sendErrorMessage(CommandContext, ITextComponent)}.
+     * 
      * @param commandContext
      * @param text
      */
@@ -50,6 +62,7 @@ public abstract class Command implements ICommand<CommandSourceDiscord, ITextCom
 
     /**
      * TODO: Code dupe with {@link #sendFeedback(CommandContext, ITextComponent)}.
+     * 
      * @param commandContext
      * @param text
      */

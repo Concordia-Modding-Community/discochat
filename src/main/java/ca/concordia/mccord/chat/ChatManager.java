@@ -4,9 +4,9 @@ import java.util.Optional;
 
 import javax.naming.AuthenticationException;
 
-import ca.concordia.mccord.discord.DiscordManager;
 import ca.concordia.mccord.entity.MCCordUser;
-import ca.concordia.mccord.server.ServerManager;
+import ca.concordia.mccord.utils.AbstractManager;
+import ca.concordia.mccord.utils.IMod;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -14,7 +14,11 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 
-public class ChatManager {
+public class ChatManager extends AbstractManager {
+    public ChatManager(IMod mod) {
+        super(mod);
+    }
+
     /**
      * Broadcasts a Discord message into Minecraft. This respects the Discord
      * channel permissions.
@@ -23,8 +27,8 @@ public class ChatManager {
      * @param messageChannel
      * @param message
      */
-    public static void broadcastMC(Message message) throws Exception {
-        MCCordUser mcCordUser = MCCordUser.fromDiscordUser(message.getAuthor()).get();
+    public void broadcastMC(Message message) throws Exception {
+        MCCordUser mcCordUser = MCCordUser.fromDiscordUser(getMod(), message.getAuthor()).get();
 
         MessageChannel channel = message.getChannel();
 
@@ -33,61 +37,63 @@ public class ChatManager {
         broadcastMC(new ChatMessage(mcCordUser, channel, content));
     }
 
-    public static void broadcastMC(ChatMessage chatMessage) throws Exception {
-        for (ServerPlayerEntity playerEntity : ServerManager.getServer().get().getPlayerList().getPlayers()) {
+    public void broadcastMC(ChatMessage chatMessage) throws Exception {
+        for (ServerPlayerEntity playerEntity : getMod().getServerManager().getServer().get().getPlayerList()
+                .getPlayers()) {
             try {
-                MCCordUser.fromMCPlayerEntity(playerEntity).get().sendMCMessage(chatMessage);
-            } catch(Exception e) {
+                MCCordUser.fromMCPlayerEntity(getMod(), playerEntity).get().sendMCMessage(chatMessage);
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
-    public static void broadcastAll(ServerPlayerEntity playerEntity, String channelName, String message) throws Exception {
+    public void broadcastAll(ServerPlayerEntity playerEntity, String channelName, String message) throws Exception {
         broadcastAll(Optional.ofNullable(playerEntity), channelName, message);
     }
 
-    public static void broadcastAll(Optional<ServerPlayerEntity> playerEntity, String channelName, String message)
+    public void broadcastAll(Optional<ServerPlayerEntity> playerEntity, String channelName, String message)
             throws Exception {
-        MCCordUser mcCordUser = MCCordUser.fromMCPlayerEntity(playerEntity).orElseThrow(AuthenticationException::new);
+        MCCordUser mcCordUser = MCCordUser.fromMCPlayerEntity(getMod(), playerEntity)
+                .orElseThrow(AuthenticationException::new);
 
         broadcastAll(mcCordUser, channelName, message);
     }
 
-    public static void broadcastAll(MCCordUser mcCordUser, String channelName, String message) throws Exception {
-        TextChannel textChannel = DiscordManager.getChannelByName(channelName).get();
+    public void broadcastAll(MCCordUser mcCordUser, String channelName, String message) throws Exception {
+        TextChannel textChannel = getMod().getDiscordManager().getChannelByName(channelName).get();
 
         ChatMessage chatMessage = new ChatMessage(mcCordUser, textChannel, new StringTextComponent(message));
 
         broadcastAll(chatMessage);
     }
 
-    public static void broadcastAll(ChatMessage chatMessage) throws Exception {
-
+    public void broadcastAll(ChatMessage chatMessage) throws Exception {
         broadcastMC(chatMessage);
 
         broadcastDiscord(chatMessage);
     }
 
-    public static void broadcastDiscord(ServerPlayerEntity playerEntity, String channelName, String message) throws Exception {
+    public void broadcastDiscord(ServerPlayerEntity playerEntity, String channelName, String message) throws Exception {
         broadcastDiscord(Optional.ofNullable(playerEntity), channelName, message);
     }
 
-    public static void broadcastDiscord(Optional<ServerPlayerEntity> playerEntity, String channelName, String message)
+    public void broadcastDiscord(Optional<ServerPlayerEntity> playerEntity, String channelName, String message)
             throws Exception {
-        MCCordUser mcCordUser = MCCordUser.fromMCPlayerEntity(playerEntity).orElseThrow(AuthenticationException::new);
+        MCCordUser mcCordUser = MCCordUser.fromMCPlayerEntity(getMod(), playerEntity)
+                .orElseThrow(AuthenticationException::new);
 
-        TextChannel textChannel = DiscordManager.getChannelByName(channelName).get();
+        TextChannel textChannel = getMod().getDiscordManager().getChannelByName(channelName).get();
 
         ChatMessage chatMessage = new ChatMessage(mcCordUser, textChannel, new StringTextComponent(message));
 
         broadcastDiscord(chatMessage);
     }
 
-    public static void broadcastDiscord(ChatMessage chatMessage) throws Exception {
+    public void broadcastDiscord(ChatMessage chatMessage) throws Exception {
         TextChannel textChannel = chatMessage.getTextChannel().get();
 
-        if(chatMessage.getMCCordUser().isChannelVisible(textChannel)) {
+        if (chatMessage.getMCCordUser().isChannelVisible(textChannel)) {
             textChannel.sendMessage(chatMessage.getDiscordText()).queue();
         }
     }

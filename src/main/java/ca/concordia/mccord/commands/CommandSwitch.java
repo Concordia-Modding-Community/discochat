@@ -16,8 +16,8 @@ public class CommandSwitch extends Command {
     @Override
     public LiteralArgumentBuilder<CommandSource> getParser() {
         return Commands.literal("switch")
-                .then(Commands.argument("channel", StringArgumentType.word())
-                        .suggests(CommandSuggestions.VISIBLE_CHANNEL_SUGGEST)
+                .then(Commands.argument("channel", StringArgumentType.word()).suggests(
+                        (context, builder) -> getMod().getCommandSuggestions().getVisibleChannels(context, builder))
                         .executes(context -> execute(context, this::defaultExecute)));
     }
 

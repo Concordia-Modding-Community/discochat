@@ -11,18 +11,19 @@ public class UserData implements INBTSerializable<CompoundNBT> {
     public static final String ANY_CHANNEL = "any-channel";
 
     private static final String MC_UUID = "mcUUID";
-    public String mcUUID = "";
+    private String mcUUID = "";
 
     private static final String DISCORD_UUID = "discordUUID";
-    public String discordUUID = "";
+    private String discordUUID = "";
 
     private static final String CURRENT_CHANNEL = "currentChannel";
-    public String currentChannel = "";
+    private String currentChannel = "";
 
     private static final String HIDDEN_CHANNELS = "channelVisibility";
-    public HashSet<String> hiddenChannels = new HashSet<String>();
-    
-    public UserData() {}
+    private HashSet<String> hiddenChannels = new HashSet<String>();
+
+    public UserData() {
+    }
 
     public UserData(CompoundNBT nbt) {
         this.deserializeNBT(nbt);
@@ -44,12 +45,44 @@ public class UserData implements INBTSerializable<CompoundNBT> {
     public void deserializeNBT(CompoundNBT nbt) {
         byte[] channelVisiblityBytes = nbt.getByteArray(HIDDEN_CHANNELS);
 
-        if(channelVisiblityBytes.length > 0) {
+        if (channelVisiblityBytes.length > 0) {
             this.hiddenChannels = SerializationUtils.deserialize(channelVisiblityBytes);
         }
-        
+
         this.discordUUID = nbt.getString(DISCORD_UUID);
         this.mcUUID = nbt.getString(MC_UUID);
         this.currentChannel = nbt.getString(CURRENT_CHANNEL);
+    }
+
+    public String getMCUUID() {
+        return mcUUID;
+    }
+
+    public String getDiscordUUID() {
+        return discordUUID;
+    }
+
+    public String getCurrentChannel() {
+        return currentChannel;
+    }
+
+    public HashSet<String> getHiddenChannels() {
+        return hiddenChannels;
+    }
+
+    public void setMCUUID(String mcUUID) {
+        this.mcUUID = mcUUID;
+    }
+
+    public void setDiscordUUID(String discordUUID) {
+        this.discordUUID = discordUUID;
+    }
+
+    public void setCurrentChannel(String currentChannel) {
+        this.currentChannel = currentChannel;
+    }
+
+    public void setHiddenChannels(HashSet<String> hiddenChannels) {
+        this.hiddenChannels = hiddenChannels;
     }
 }

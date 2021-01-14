@@ -6,7 +6,6 @@ import com.mojang.brigadier.context.CommandContext;
 
 import ca.concordia.b4dis.CommandSourceDiscord;
 import ca.concordia.b4dis.DiscordBrigadier;
-import ca.concordia.mccord.entity.UserManager;
 import net.dv8tion.jda.api.entities.User;
 import net.minecraft.command.CommandException;
 import net.minecraft.entity.player.PlayerEntity;
@@ -24,7 +23,7 @@ public class CommandLink extends Command {
     public ITextComponent defaultExecute(CommandContext<CommandSourceDiscord> context) throws CommandException {
         String minecraftName = StringArgumentType.getString(context, "player");
 
-        PlayerEntity playerEntity = UserManager.fromMCName(minecraftName)
+        PlayerEntity playerEntity = getMod().getUserManager().fromMCName(minecraftName)
                 .orElseThrow(() -> new CommandException(new StringTextComponent("Unable to find MC username.")));
 
         User author = context.getSource().getUser();
@@ -33,7 +32,7 @@ public class CommandLink extends Command {
 
         String mcUUID = playerEntity.getUniqueID().toString();
 
-        UserManager.link(mcUUID, discordUUID);
+        getMod().getUserManager().link(mcUUID, discordUUID);
 
         ITextComponent text = new StringTextComponent(
                 "Discord Account " + TextFormatting.BLUE + "@" + author.getAsTag() + TextFormatting.RESET + " Linked.");

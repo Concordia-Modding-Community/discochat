@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Optional;
 
 import ca.concordia.mccord.Config;
-import ca.concordia.mccord.MCCord;
-import ca.concordia.mccord.chat.ChatManager;
 import ca.concordia.mccord.discord.commands.DiscordCommandManager;
+import ca.concordia.mccord.utils.AbstractManager;
+import ca.concordia.mccord.utils.IMod;
 import ca.concordia.b4dis.DiscordBrigadier;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -18,18 +18,27 @@ import net.dv8tion.jda.api.entities.User;
 /**
  * A wrapper around JDA.
  */
-public class DiscordManager {
-    private static Optional<JDA> jda = Optional.empty();
-    private static DiscordBrigadier discordBrigadier = new DiscordBrigadier(() -> Config.DISCORD_COMMAND_PREFIX.get(),
+public class DiscordManager extends AbstractManager {
+    private Optional<JDA> jda = Optional.empty();
+    private DiscordBrigadier discordBrigadier = new DiscordBrigadier(() -> Config.DISCORD_COMMAND_PREFIX.get(),
             message -> handleMessage(message));
+    private DiscordCommandManager discordCommandManager;
 
-    public static void register() {
-        connect(Config.DISCORD_API_KEY.get());
+    public DiscordManager(IMod mod) {
+        super(mod);
 
-        DiscordCommandManager.register(discordBrigadier.getDispatcher());
+        this.discordCommandManager = new DiscordCommandManager(mod);
     }
 
-    public static void unregister() {
+    public DiscordManager register() {
+        connect(Config.DISCORD_API_KEY.get());
+
+        discordCommandManager.register(discordBrigadier.getDispatcher());
+
+        return this;
+    }
+
+    public void unregister() {
         disconnect();
     }
 
@@ -39,7 +48,7 @@ public class DiscordManager {
      * 
      * @param token The Discord API Token.
      */
-    public static boolean connect(String token) {
+    public boolean connect(String token) {
         try {
             if (isConnected()) {
                 throw new Exception("JDA already connected.");
@@ -68,7 +77,7 @@ public class DiscordManager {
      * 
      * @return Discord connection active.
      */
-    public static boolean isConnected() {
+    public boolean isConnected() {
         return jda.isPresent();
     }
 
@@ -76,7 +85,7 @@ public class DiscordManager {
      * Disconnects Discord connection if already connected. This method is
      * automatically called by ServerEvents.
      */
-    public static void disconnect() {
+    public void disconnect() {
         try {
             jda.get().shutdown();
 
@@ -90,11 +99,9 @@ public class DiscordManager {
      * 
      * @param message Message to handle.
      */
-    private static void handleMessage(Message message) {
-        MCCord.LOGGER.error(message.getContentRaw());
-
+    private void handleMessage(Message message) {
         try {
-            ChatManager.broadcastMC(message);
+            getMod().getChatManager().broadcastMC(message);
         } catch (Exception e) {
             message.getChannel().sendMessage("Unable to send message to MC.").queue();
         }
@@ -103,7 +110,7 @@ public class DiscordManager {
     /**
      * Gets list of Discord channels.
      */
-    public static Optional<List<TextChannel>> getChannels() {
+    public Optional<List<TextChannel>> getChannels() {
         try {
             return Optional.ofNullable(jda.get().getTextChannels());
         } catch (Exception e) {
@@ -116,7 +123,7 @@ public class DiscordManager {
      * 
      * TODO: Make sure the channels is singular?
      */
-    public static Optional<TextChannel> getChannelByName(String name) {
+    public Optional<TextChannel> getChannelByName(String name) {
         try {
             List<TextChannel> channels = jda.get().getTextChannelsByName(name, true);
 
@@ -126,7 +133,7 @@ public class DiscordManager {
         }
     }
 
-    public static Optional<User> getUserFromUUID(String uuid) {
+    public Optional<User> getUserFromUUID(String uuid) {
         try {
             return Optional.ofNullable(jda.get().retrieveUserById(uuid).complete());
         } catch (Exception e) {
@@ -134,7 +141,7 @@ public class DiscordManager {
         }
     }
 
-    public static Optional<User> getUserByTag(String tag) {
+    public Optional<User> getUserByTag(String tag) {
         try {
             return Optional.ofNullable(jda.get().getUserByTag(tag));
         } catch (Exception e) {
@@ -142,7 +149,7 @@ public class DiscordManager {
         }
     }
 
-    public static Optional<User> getUserByTag(String username, String discriminator) {
+    public Optional<User> getUserByTag(String username, String discriminator) {
         try {
             return Optional.ofNullable(jda.get().getUserByTag(username, discriminator));
         } catch (Exception e) {
@@ -150,7 +157,7 @@ public class DiscordManager {
         }
     }
 
-    public static boolean isChannelAccessible(User user, MessageChannel channel) {
+    public boolean isChannelAccessible(User user, MessageChannel channel) {
         try {
             TextChannel textChannel = (TextChannel) channel;
 

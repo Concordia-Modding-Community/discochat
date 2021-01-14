@@ -9,7 +9,9 @@ import com.mojang.brigadier.context.CommandContext;
 public interface ICommand<T, U> {
     LiteralArgumentBuilder<T> getParser();
 
-    void register(CommandDispatcher<T> dispatcher);
+    void register(IMod mod, CommandDispatcher<T> dispatcher);
 
     int execute(CommandContext<T> commandContext, Function<CommandContext<T>, U> function);
+
+    IMod getMod();
 }

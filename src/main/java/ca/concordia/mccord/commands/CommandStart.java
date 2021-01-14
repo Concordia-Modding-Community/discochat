@@ -4,7 +4,6 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 
 import ca.concordia.mccord.Config;
-import ca.concordia.mccord.discord.DiscordManager;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
@@ -20,7 +19,7 @@ public class CommandStart extends Command {
     }
 
     protected ITextComponent defaultExecute(CommandContext<CommandSource> commandContext) throws CommandException {
-        if (DiscordManager.isConnected()) {
+        if (getMod().getDiscordManager().isConnected()) {
             throw new CommandException(new StringTextComponent(TextFormatting.RED + "Discord already connected."));
         }
 
@@ -28,7 +27,7 @@ public class CommandStart extends Command {
             throw new CommandException(new StringTextComponent(TextFormatting.RED + "No valid token set."));
         }
 
-        if (!DiscordManager.connect(Config.DISCORD_API_KEY.get())) {
+        if (!getMod().getDiscordManager().connect(Config.DISCORD_API_KEY.get())) {
             throw new CommandException(new StringTextComponent(TextFormatting.RED + "Unable to connect to Discord."));
         }
 

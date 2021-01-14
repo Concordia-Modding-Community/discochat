@@ -9,6 +9,7 @@ import com.mojang.brigadier.context.CommandContext;
 import ca.concordia.mccord.Config;
 import ca.concordia.mccord.entity.MCCordUser;
 import ca.concordia.mccord.utils.ICommand;
+import ca.concordia.mccord.utils.IMod;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
@@ -21,9 +22,16 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 
 public abstract class Command implements ICommand<CommandSource, ITextComponent> {
+    private IMod mod;
+
     @Override
-    public void register(CommandDispatcher<CommandSource> dispatcher) {
+    public void register(IMod mod, CommandDispatcher<CommandSource> dispatcher) {
         dispatcher.register(Commands.literal(Config.MC_COMMAND_PREFIX.get()).then(getParser()));
+    }
+
+    @Override
+    public IMod getMod() {
+        return mod;
     }
 
     /**
@@ -78,7 +86,7 @@ public abstract class Command implements ICommand<CommandSource, ITextComponent>
     public Optional<MCCordUser> getSourceMCCordUser(CommandContext<CommandSource> commandContext) {
         Optional<ServerPlayerEntity> playerEntity = getSourcePlayer(commandContext);
 
-        return MCCordUser.fromMCPlayerEntity(playerEntity);
+        return MCCordUser.fromMCPlayerEntity(getMod(), playerEntity);
     }
 
     public Optional<ServerPlayerEntity> getSourcePlayer(CommandContext<CommandSource> commandContext) {

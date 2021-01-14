@@ -47,6 +47,7 @@ public class Config {
 
     /**
      * Creates the Discord TOML config.
+     * 
      * @param builder
      */
     public static void buildDiscordConfig(ForgeConfigSpec.Builder builder) {
@@ -73,6 +74,7 @@ public class Config {
 
     /**
      * TODO: Add hidden Discord channels.
+     * 
      * @param channel
      * @return
      */

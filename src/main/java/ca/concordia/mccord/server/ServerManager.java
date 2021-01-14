@@ -2,20 +2,28 @@ package ca.concordia.mccord.server;
 
 import java.util.Optional;
 
+import ca.concordia.mccord.utils.AbstractManager;
+import ca.concordia.mccord.utils.IMod;
 import net.minecraft.server.MinecraftServer;
 
-public class ServerManager {
-    private static MinecraftServer SERVER = null;
+public class ServerManager extends AbstractManager {
+    private MinecraftServer server = null;
 
-    public static void register(MinecraftServer server) {
-        SERVER = server;
+    public ServerManager(IMod mod) {
+        super(mod);
     }
 
-    public static void unregister() {
-        SERVER = null;
+    public ServerManager register(MinecraftServer server) {
+        this.server = server;
+
+        return this;
     }
 
-    public static Optional<MinecraftServer> getServer() {
-        return Optional.ofNullable(SERVER);
+    public void unregister() {
+        this.server = null;
+    }
+
+    public Optional<MinecraftServer> getServer() {
+        return Optional.ofNullable(this.server);
     }
 }

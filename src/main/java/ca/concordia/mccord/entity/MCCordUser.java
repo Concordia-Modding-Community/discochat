@@ -9,9 +9,8 @@ import java.util.stream.Collectors;
 
 import ca.concordia.mccord.Config;
 import ca.concordia.mccord.chat.ChatMessage;
-import ca.concordia.mccord.data.DataManager;
 import ca.concordia.mccord.data.UserData;
-import ca.concordia.mccord.discord.DiscordManager;
+import ca.concordia.mccord.utils.IMod;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -21,79 +20,92 @@ import net.minecraft.util.text.ITextComponent;
 public class MCCordUser {
     private ServerPlayerEntity playerEntity;
     private User user;
+    private IMod mod;
 
-    private MCCordUser(Optional<ServerPlayerEntity> playerEntity, Optional<User> user) throws Exception {
+    private MCCordUser(IMod mod, Optional<ServerPlayerEntity> playerEntity, Optional<User> user) throws Exception {
+        this.mod = mod;
+
         if (playerEntity.isPresent() && user.isPresent()) {
             this.playerEntity = playerEntity.get();
             this.user = user.get();
         } else if (playerEntity.isPresent()) {
             this.playerEntity = playerEntity.get();
-            this.user = UserManager.getDiscordUserFromPlayerEntity(playerEntity).get();
+            this.user = mod.getUserManager().getDiscordUserFromPlayerEntity(playerEntity.get()).get();
         } else if (user.isPresent()) {
-            this.playerEntity = UserManager.getPlayerEntityFromDiscordUser(user).get();
+            this.playerEntity = mod.getUserManager().getPlayerEntityFromDiscordUser(user.get()).get();
             this.user = user.get();
         } else {
             throw new Exception("Constructing empty MCCordUser.");
         }
     }
 
-    private static Optional<MCCordUser> fromOptional(Optional<ServerPlayerEntity> playerEntity, Optional<User> user) {
+    protected IMod getMod() {
+        return this.mod;
+    }
+
+    public MCCordUser(ServerPlayerEntity playerEntity, User user) {
+        this.playerEntity = playerEntity;
+        this.user = user;
+    }
+
+    private static Optional<MCCordUser> fromOptional(IMod mod, Optional<ServerPlayerEntity> playerEntity,
+            Optional<User> user) {
         try {
-            return Optional.ofNullable(new MCCordUser(playerEntity, user));
+            return Optional.ofNullable(new MCCordUser(mod, playerEntity, user));
         } catch (Exception e) {
             return Optional.empty();
         }
     }
 
-    public static Optional<MCCordUser> fromDiscordUUID(String discordUUID) {
-        return fromOptional(Optional.empty(), UserManager.fromDiscordUUID(discordUUID));
+    public static Optional<MCCordUser> fromDiscordUUID(IMod mod, String discordUUID) {
+        return fromOptional(mod, Optional.empty(), mod.getUserManager().fromDiscordUUID(discordUUID));
     }
 
-    public static Optional<MCCordUser> fromDiscordTag(String tag) {
-        return fromOptional(Optional.empty(), UserManager.fromDiscordTag(tag));
+    public static Optional<MCCordUser> fromDiscordTag(IMod mod, String tag) {
+        return fromOptional(mod, Optional.empty(), mod.getUserManager().fromDiscordTag(tag));
     }
 
-    public static Optional<MCCordUser> fromDiscordTag(String username, String discriminator) {
-        return fromOptional(Optional.empty(), UserManager.fromDiscordTag(username, discriminator));
+    public static Optional<MCCordUser> fromDiscordTag(IMod mod, String username, String discriminator) {
+        return fromOptional(mod, Optional.empty(), mod.getUserManager().fromDiscordTag(username, discriminator));
     }
 
-    public static Optional<MCCordUser> fromDiscordUser(User user) {
-        return fromDiscordUser(Optional.ofNullable(user));
+    public static Optional<MCCordUser> fromDiscordUser(IMod mod, User user) {
+        return fromDiscordUser(mod, Optional.ofNullable(user));
     }
 
-    public static Optional<MCCordUser> fromDiscordUser(Optional<User> user) {
-        return fromOptional(Optional.empty(), user);
+    public static Optional<MCCordUser> fromDiscordUser(IMod mod, Optional<User> user) {
+        return fromOptional(mod, Optional.empty(), user);
     }
 
-    public static Optional<MCCordUser> fromMCName(String name) {
-        return fromOptional(UserManager.fromMCName(name), Optional.empty());
+    public static Optional<MCCordUser> fromMCName(IMod mod, String name) {
+        return fromOptional(mod, mod.getUserManager().fromMCName(name), Optional.empty());
     }
 
-    public static Optional<MCCordUser> fromMCUUID(String uuid) {
-        return fromOptional(UserManager.fromMCUUID(uuid), Optional.empty());
+    public static Optional<MCCordUser> fromMCUUID(IMod mod, String uuid) {
+        return fromOptional(mod, mod.getUserManager().fromMCUUID(uuid), Optional.empty());
     }
 
-    public static Optional<MCCordUser> fromMCPlayerEntity(Optional<ServerPlayerEntity> playerEntity) {
-        return fromOptional(playerEntity, Optional.empty());
+    public static Optional<MCCordUser> fromMCPlayerEntity(IMod mod, Optional<ServerPlayerEntity> playerEntity) {
+        return fromOptional(mod, playerEntity, Optional.empty());
     }
 
-    public static Optional<MCCordUser> fromMCPlayerEntity(ServerPlayerEntity playerEntity) {
-        return fromMCPlayerEntity(Optional.ofNullable(playerEntity));
+    public static Optional<MCCordUser> fromMCPlayerEntity(IMod mod, ServerPlayerEntity playerEntity) {
+        return fromMCPlayerEntity(mod, Optional.ofNullable(playerEntity));
     }
 
     private Optional<UserData> getUserData() {
-        return DataManager.getUserData(playerEntity);
+        return getMod().getDataManager().getUserData(playerEntity);
     }
 
     private void setUserData(Consumer<UserData> function) {
-        DataManager.setUserData(this.getMCUUID(), function);
+        getMod().getDataManager().setUserData(this.getMCUUID(), function);
     }
 
     /**
      * @return
      */
     public String getCurrentChannel() {
-        String channel = this.getUserData().get().currentChannel;
+        String channel = this.getUserData().get().getCurrentChannel();
 
         if (channel.isBlank()) {
             return Config.DEFAULT_CHANNEL.get();
@@ -107,7 +119,7 @@ public class MCCordUser {
      */
     public void setCurrentChannel(String channelName) {
         this.setUserData(userData -> {
-            userData.currentChannel = channelName;
+            userData.setCurrentChannel(channelName);
         });
     }
 
@@ -116,13 +128,13 @@ public class MCCordUser {
      */
     public void setChannelHidden(String channelName) {
         this.setUserData(userData -> {
-            userData.hiddenChannels.add(channelName);
+            userData.getHiddenChannels().add(channelName);
         });
     }
 
     public void setChannelVisible(String channelName) {
         this.setUserData(userData -> {
-            userData.hiddenChannels.remove(channelName);
+            userData.getHiddenChannels().remove(channelName);
         });
     }
 
@@ -131,7 +143,7 @@ public class MCCordUser {
      */
     public void setAllChannelVisible() {
         this.setUserData(userData -> {
-            userData.hiddenChannels = new HashSet<>();
+            userData.setHiddenChannels(new HashSet<>());
         });
     }
 
@@ -140,9 +152,9 @@ public class MCCordUser {
      */
     public void setNoChannelVisible() {
         this.setUserData(userData -> {
-            userData.hiddenChannels = new HashSet<>();
+            userData.setHiddenChannels(new HashSet<>());
 
-            userData.hiddenChannels.add(UserData.ANY_CHANNEL);
+            userData.getHiddenChannels().add(UserData.ANY_CHANNEL);
         });
     }
 
@@ -153,7 +165,7 @@ public class MCCordUser {
      * @return
      */
     public boolean isChannelAccessible(MessageChannel channel) {
-        return Config.isChannelAccessible(channel) && DiscordManager.isChannelAccessible(user, channel);
+        return Config.isChannelAccessible(channel) && getMod().getDiscordManager().isChannelAccessible(user, channel);
     }
 
     /**
@@ -171,11 +183,11 @@ public class MCCordUser {
                 throw new Exception("Does not have channel access");
             }
 
-            if (userData.hiddenChannels.contains(UserData.ANY_CHANNEL)) {
+            if (userData.getHiddenChannels().contains(UserData.ANY_CHANNEL)) {
                 throw new Exception("No visible channel");
             }
 
-            if (userData.hiddenChannels.contains(channel.getName())) {
+            if (userData.getHiddenChannels().contains(channel.getName())) {
                 throw new Exception("Channel not set visibile");
             }
         } catch (Exception e) {
@@ -189,8 +201,8 @@ public class MCCordUser {
 
     public List<TextChannel> getAccessibleChannels() {
         try {
-            return DiscordManager.getChannels().get().stream().filter(channel -> this.isChannelAccessible(channel))
-                    .collect(Collectors.toList());
+            return getMod().getDiscordManager().getChannels().get().stream()
+                    .filter(channel -> this.isChannelAccessible(channel)).collect(Collectors.toList());
         } catch (Exception e) {
             return new ArrayList<TextChannel>();
         }
@@ -198,8 +210,8 @@ public class MCCordUser {
 
     public List<TextChannel> getVisibleChannels() {
         try {
-            return DiscordManager.getChannels().get().stream().filter(channel -> this.isChannelVisible(channel))
-                    .collect(Collectors.toList());
+            return getMod().getDiscordManager().getChannels().get().stream()
+                    .filter(channel -> this.isChannelVisible(channel)).collect(Collectors.toList());
         } catch (Exception e) {
             return new ArrayList<TextChannel>();
         }
@@ -231,6 +243,10 @@ public class MCCordUser {
 
     public String getMCName() {
         return playerEntity.getName().getString();
+    }
+
+    public String getDiscordUUID() {
+        return user.getId();
     }
 
     public String getMCUUID() {

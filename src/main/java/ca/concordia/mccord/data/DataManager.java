@@ -5,56 +5,66 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import ca.concordia.mccord.Config;
+import ca.concordia.mccord.utils.AbstractManager;
+import ca.concordia.mccord.utils.IMod;
 import net.dv8tion.jda.api.entities.User;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraftforge.common.util.INBTSerializable;
 
-public class DataManager implements INBTSerializable<CompoundNBT> {
+public class DataManager extends AbstractManager implements INBTSerializable<CompoundNBT> {
     private static final String PLAYER_DATA = "playerData";
-    private static CompoundNBT playerDataNBT = new CompoundNBT();
+    public CompoundNBT playerDataNBT;
     private static final String DISCORD_MAPPING = "discordUUID";
-    private static CompoundNBT discordMappingNBT = new CompoundNBT();
+    public CompoundNBT discordMappingNBT;
 
-    public static void register() {
-        loadUserData();
+    public DataManager(IMod mod) {
+        super(mod);
+        this.playerDataNBT = new CompoundNBT();
+        this.discordMappingNBT = new CompoundNBT();
     }
 
-    public static void unregister() {
+    public DataManager register() {
+        loadUserData();
+
+        return this;
+    }
+
+    public void unregister() {
         saveUserData();
     }
 
-    public static boolean containsUser(User user) {
+    public boolean containsUser(User user) {
         return containsUserDiscord(user.getId());
     }
 
-    public static boolean containsUser(PlayerEntity playerEntity) {
+    public boolean containsUser(PlayerEntity playerEntity) {
         return containsUserMC(playerEntity.getUniqueID().toString());
     }
 
-    public static boolean containsUser(String mcUUID, String discordUUID) {
+    public boolean containsUser(String mcUUID, String discordUUID) {
         return containsUserMC(mcUUID) || containsUserDiscord(discordUUID);
     }
 
-    private static boolean containsUserMC(String mcUUID) {
+    private boolean containsUserMC(String mcUUID) {
         return playerDataNBT.contains(mcUUID);
     }
 
-    private static boolean containsUserDiscord(String discordUUID) {
+    private boolean containsUserDiscord(String discordUUID) {
         return discordMappingNBT.contains(discordUUID);
     }
 
-    public static Optional<UserData> getUserData(User user) {
+    public Optional<UserData> getUserData(User user) {
         return getUserDataDiscord(user.getId());
     }
 
-    public static Optional<UserData> getUserData(PlayerEntity playerEntity) {
+    public Optional<UserData> getUserData(PlayerEntity playerEntity) {
         return getUserDataMC(playerEntity.getUniqueID().toString());
     }
 
-    private static Optional<UserData> getUserDataDiscord(String discordUUID) {
-        if(!discordMappingNBT.contains(discordUUID)) {
+    private Optional<UserData> getUserDataDiscord(String discordUUID) {
+        if (!discordMappingNBT.contains(discordUUID)) {
             return Optional.empty();
         }
 
@@ -65,8 +75,8 @@ public class DataManager implements INBTSerializable<CompoundNBT> {
      * @param mcUUID
      * @return
      */
-    private static Optional<UserData> getUserDataMC(String mcUUID) {
-        if(!playerDataNBT.contains(mcUUID)) {
+    private Optional<UserData> getUserDataMC(String mcUUID) {
+        if (!playerDataNBT.contains(mcUUID)) {
             return Optional.empty();
         }
 
@@ -75,7 +85,7 @@ public class DataManager implements INBTSerializable<CompoundNBT> {
         return Optional.of(new UserData(nbt));
     }
 
-    public static void setUserData(String mcUUID, Consumer<UserData> function) {
+    public void setUserData(String mcUUID, Consumer<UserData> function) {
         Optional<UserData> oUserData = getUserDataMC(mcUUID);
 
         UserData userData;
@@ -88,10 +98,10 @@ public class DataManager implements INBTSerializable<CompoundNBT> {
 
         function.accept(userData);
 
-        userData.mcUUID = mcUUID;
+        userData.setMCUUID(mcUUID);
 
-        if(!userData.discordUUID.isBlank()) {
-            discordMappingNBT.putString(userData.discordUUID, mcUUID);
+        if (!userData.getDiscordUUID().isBlank()) {
+            discordMappingNBT.putString(userData.getDiscordUUID(), mcUUID);
         }
 
         playerDataNBT.put(mcUUID, userData.serializeNBT());
@@ -100,7 +110,7 @@ public class DataManager implements INBTSerializable<CompoundNBT> {
         saveUserData();
     }
 
-    private static void loadUserData() {
+    private void loadUserData() {
         File file = new File(Config.DATA_LOCATION.get());
 
         if (!file.exists()) {
@@ -110,13 +120,13 @@ public class DataManager implements INBTSerializable<CompoundNBT> {
         try {
             CompoundNBT nbt = CompressedStreamTools.read(file);
 
-            sDeserializeNBT(nbt);
-        } catch(Exception e) {
+            deserializeNBT(nbt);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private static void saveUserData() {
+    private void saveUserData() {
         File file = new File(Config.DATA_LOCATION.get());
 
         try {
@@ -124,18 +134,10 @@ public class DataManager implements INBTSerializable<CompoundNBT> {
                 file.createNewFile();
             }
 
-            CompressedStreamTools.write(sSerializeNBT(), file);
-        } catch(Exception e) {
+            CompressedStreamTools.write(serializeNBT(), file);
+        } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public static void sDeserializeNBT(CompoundNBT nbt) {
-        new DataManager().deserializeNBT(nbt);
-    }
-
-    public static CompoundNBT sSerializeNBT() {
-        return new DataManager().serializeNBT();
     }
 
     @Override
