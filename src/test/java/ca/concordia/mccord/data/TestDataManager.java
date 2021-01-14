@@ -1,6 +1,8 @@
 package ca.concordia.mccord.data;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.spy;
 
 import org.junit.Test;
 
@@ -14,6 +16,12 @@ public class TestDataManager {
         public static DataManager create() {
             DataManager dataManager = new DataManager(TestMod.Mocked.MOD);
 
+            dataManager = spy(dataManager);
+
+            doAnswer(invocation -> null).when(dataManager).loadUserData();
+
+            doAnswer(invocation -> null).when(dataManager).saveUserData();
+
             dataManager.setUserData(TestPlayerEntity.Mocked.VALID_MC_UUID, userData -> {
                 userData.setDiscordUUID(TestUser.Mocked.VALID_DISCORD_UUID);
                 userData.setCurrentChannel(TestChannel.Mocked.VALID_CHANNEL_NAME);
@@ -25,13 +33,19 @@ public class TestDataManager {
 
     @Test
     public void testGetUserDataFromPlayerEntity() {
-        assertEquals(TestUser.Mocked.VALID_DISCORD_UUID, TestMod.Mocked.MOD.getDataManager()
-                .getUserData(TestPlayerEntity.Mocked.create()).get().getDiscordUUID());
+        DataManager dataManager = TestMod.Mocked.MOD.getDataManager();
+
+        UserData userData = dataManager.getUserData(TestPlayerEntity.Mocked.create()).get();
+
+        assertEquals(TestUser.Mocked.VALID_DISCORD_UUID, userData.getDiscordUUID());
     }
 
     @Test
     public void testGetUserDataFromUser() {
-        assertEquals(TestPlayerEntity.Mocked.VALID_MC_UUID,
-                TestMod.Mocked.MOD.getDataManager().getUserData(TestUser.Mocked.create()).get().getMCUUID());
+        DataManager dataManager = TestMod.Mocked.MOD.getDataManager();
+
+        UserData userData = dataManager.getUserData(TestUser.Mocked.create()).get();
+
+        assertEquals(TestPlayerEntity.Mocked.VALID_MC_UUID, userData.getMCUUID());
     }
 }

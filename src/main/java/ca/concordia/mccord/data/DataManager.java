@@ -109,7 +109,7 @@ public class DataManager extends AbstractManager implements INBTSerializable<Com
         saveUserData();
     }
 
-    private void loadUserData() {
+    public void loadUserData() {
         File file = new File(getMod().getConfigManager().getDataLocation());
 
         if (!file.exists()) {
@@ -125,7 +125,7 @@ public class DataManager extends AbstractManager implements INBTSerializable<Com
         }
     }
 
-    private void saveUserData() {
+    public void saveUserData() {
         File file = new File(getMod().getConfigManager().getDataLocation());
 
         try {
