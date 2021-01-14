@@ -5,6 +5,7 @@ import ca.concordia.mccord.commands.CommandSuggestions;
 import ca.concordia.mccord.data.DataManager;
 import ca.concordia.mccord.discord.DiscordManager;
 import ca.concordia.mccord.entity.UserManager;
+import ca.concordia.mccord.server.ConfigManager;
 import ca.concordia.mccord.server.ServerManager;
 
 public interface IMod {
@@ -19,4 +20,6 @@ public interface IMod {
     ServerManager getServerManager();
 
     CommandSuggestions getCommandSuggestions();
+
+    ConfigManager getConfigManager();
 }

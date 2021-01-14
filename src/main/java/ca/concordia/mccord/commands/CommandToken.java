@@ -4,7 +4,6 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 
-import ca.concordia.mccord.Config;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
@@ -23,7 +22,7 @@ public class CommandToken extends Command {
     protected ITextComponent defaultExecute(CommandContext<CommandSource> commandContext) throws CommandException {
         String key = StringArgumentType.getString(commandContext, "key");
 
-        Config.DISCORD_API_KEY.set(key);
+        getMod().getConfigManager().setDiscordToken(key);
 
         return new StringTextComponent(TextFormatting.GREEN + "Discord token set.");
     }

@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import ca.concordia.mccord.Config;
 import ca.concordia.mccord.utils.AbstractManager;
 import ca.concordia.mccord.utils.IMod;
 import net.dv8tion.jda.api.entities.User;
@@ -111,7 +110,7 @@ public class DataManager extends AbstractManager implements INBTSerializable<Com
     }
 
     private void loadUserData() {
-        File file = new File(Config.DATA_LOCATION.get());
+        File file = new File(getMod().getConfigManager().getDataLocation());
 
         if (!file.exists()) {
             return;
@@ -127,7 +126,7 @@ public class DataManager extends AbstractManager implements INBTSerializable<Com
     }
 
     private void saveUserData() {
-        File file = new File(Config.DATA_LOCATION.get());
+        File file = new File(getMod().getConfigManager().getDataLocation());
 
         try {
             if (!file.exists()) {

@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import ca.concordia.mccord.Config;
 import ca.concordia.mccord.chat.ChatMessage;
 import ca.concordia.mccord.data.UserData;
 import ca.concordia.mccord.utils.IMod;
@@ -108,7 +107,7 @@ public class MCCordUser {
         String channel = this.getUserData().get().getCurrentChannel();
 
         if (channel.isBlank()) {
-            return Config.DEFAULT_CHANNEL.get();
+            return getMod().getConfigManager().getDefaultChannel();
         }
 
         return channel;
@@ -165,7 +164,7 @@ public class MCCordUser {
      * @return
      */
     public boolean isChannelAccessible(MessageChannel channel) {
-        return Config.isChannelAccessible(channel) && getMod().getDiscordManager().isChannelAccessible(user, channel);
+        return getMod().getConfigManager().isChannelAccessible(channel) && getMod().getDiscordManager().isChannelAccessible(user, channel);
     }
 
     /**

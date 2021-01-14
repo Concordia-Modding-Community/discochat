@@ -19,6 +19,7 @@ import ca.concordia.mccord.data.DataManager;
 import ca.concordia.mccord.discord.DiscordManager;
 import ca.concordia.mccord.entity.UserManager;
 import ca.concordia.mccord.events.EventManager;
+import ca.concordia.mccord.server.ConfigManager;
 import ca.concordia.mccord.server.ServerManager;
 import ca.concordia.mccord.utils.IMod;
 
@@ -33,11 +34,13 @@ public class MCCord implements IMod {
     private EventManager eventManager;
     private CommandManager commandManager;
     private CommandSuggestions commandSuggestions;
+    private ConfigManager configManager;
 
     public MCCord() {
         this.discordManager = new DiscordManager(this);
         this.serverManager = new ServerManager(this);
         this.dataManager = new DataManager(this);
+        this.configManager = new ConfigManager(this);
 
         this.userManager = new UserManager(this);
         this.eventManager = new EventManager(this);
@@ -55,10 +58,11 @@ public class MCCord implements IMod {
      * @param serverManager
      * @param dataManager
      */
-    public MCCord(DiscordManager discordManager, ServerManager serverManager, DataManager dataManager) {
+    public MCCord(DiscordManager discordManager, ServerManager serverManager, DataManager dataManager, ConfigManager configManager) {
         this.discordManager = discordManager;
         this.serverManager = serverManager;
         this.dataManager = dataManager;
+        this.configManager = configManager;
 
         this.userManager = new UserManager(this);
         this.eventManager = new EventManager(this);
@@ -68,7 +72,7 @@ public class MCCord implements IMod {
     }
 
     private void register() {
-        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, Config.SERVER_CONFIG);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, configManager.getServerConfigs());
 
         eventManager.register(MinecraftForge.EVENT_BUS);
 
@@ -121,5 +125,10 @@ public class MCCord implements IMod {
     @Override
     public CommandSuggestions getCommandSuggestions() {
         return commandSuggestions;
+    }
+
+    @Override
+    public ConfigManager getConfigManager() {
+        return configManager;
     }
 }

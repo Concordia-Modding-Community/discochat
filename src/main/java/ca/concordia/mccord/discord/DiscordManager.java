@@ -3,7 +3,6 @@ package ca.concordia.mccord.discord;
 import java.util.List;
 import java.util.Optional;
 
-import ca.concordia.mccord.Config;
 import ca.concordia.mccord.discord.commands.DiscordCommandManager;
 import ca.concordia.mccord.utils.AbstractManager;
 import ca.concordia.mccord.utils.IMod;
@@ -20,18 +19,20 @@ import net.dv8tion.jda.api.entities.User;
  */
 public class DiscordManager extends AbstractManager {
     private Optional<JDA> jda = Optional.empty();
-    private DiscordBrigadier discordBrigadier = new DiscordBrigadier(() -> Config.DISCORD_COMMAND_PREFIX.get(),
-            message -> handleMessage(message));
+    private DiscordBrigadier discordBrigadier;
     private DiscordCommandManager discordCommandManager;
 
     public DiscordManager(IMod mod) {
         super(mod);
 
+        this.discordBrigadier = new DiscordBrigadier(() -> getMod().getConfigManager().getDiscordCommandPrefix(),
+                message -> handleMessage(message));
+
         this.discordCommandManager = new DiscordCommandManager(mod);
     }
 
     public DiscordManager register() {
-        connect(Config.DISCORD_API_KEY.get());
+        connect(getMod().getConfigManager().getDiscordToken());
 
         discordCommandManager.register(discordBrigadier.getDispatcher());
 
@@ -40,6 +41,10 @@ public class DiscordManager extends AbstractManager {
 
     public void unregister() {
         disconnect();
+    }
+
+    public boolean connect() {
+        return connect(getMod().getConfigManager().getDiscordToken());
     }
 
     /**

@@ -6,7 +6,6 @@ import java.util.function.Function;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 
-import ca.concordia.mccord.Config;
 import ca.concordia.mccord.entity.MCCordUser;
 import ca.concordia.mccord.utils.ICommand;
 import ca.concordia.mccord.utils.IMod;
@@ -26,7 +25,7 @@ public abstract class Command implements ICommand<CommandSource, ITextComponent>
 
     @Override
     public void register(IMod mod, CommandDispatcher<CommandSource> dispatcher) {
-        dispatcher.register(Commands.literal(Config.MC_COMMAND_PREFIX.get()).then(getParser()));
+        dispatcher.register(Commands.literal(getMod().getConfigManager().getMCCommandPrefix()).then(getParser()));
     }
 
     @Override

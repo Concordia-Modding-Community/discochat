@@ -6,7 +6,6 @@ import com.mojang.brigadier.context.CommandContext;
 
 import ca.concordia.b4dis.CommandSourceDiscord;
 import ca.concordia.b4dis.DiscordBrigadier;
-import ca.concordia.mccord.Config;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.minecraft.command.CommandException;
 import net.minecraft.util.text.ITextComponent;
@@ -15,7 +14,8 @@ import net.minecraft.util.text.StringTextComponent;
 public class CommandDefault extends Command {
     @Override
     public LiteralArgumentBuilder<CommandSourceDiscord> getParser() {
-        return DiscordBrigadier.literal("default").requires(context -> context.hasRole(Config.DISCORD_ADMIN_ROLE.get()))
+        return DiscordBrigadier.literal("default")
+                .requires(context -> context.hasRole(getMod().getConfigManager().getDiscordAdminRole()))
                 .then(DiscordBrigadier.argument("channel", StringArgumentType.word())
                         .executes(context -> execute(context, this::defaultExecute)));
     }
@@ -26,7 +26,7 @@ public class CommandDefault extends Command {
         TextChannel textChannel = getMod().getDiscordManager().getChannelByName(channel)
                 .orElseThrow(() -> new CommandException(new StringTextComponent("Unable to find channel #" + channel)));
 
-        Config.DEFAULT_CHANNEL.set(textChannel.getName());
+        getMod().getConfigManager().setDefaultChannel(textChannel.getName());
 
         return new StringTextComponent("Set default channel to #" + textChannel.getName());
     }
