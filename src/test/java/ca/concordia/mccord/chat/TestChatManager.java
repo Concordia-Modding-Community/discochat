@@ -1,6 +1,13 @@
 package ca.concordia.mccord.chat;
 
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.util.Stack;
+
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.requests.restaction.MessageAction;
 
 public class TestChatManager {
     public static class Mocked {
@@ -26,6 +33,30 @@ public class TestChatManager {
 
         public static String getLastDiscordMessage() {
             return DISCORD_MESSAGES.lastElement();
+        }
+
+        public static MessageAction createMessageAction(String message) {
+            MessageAction messageAction = mock(MessageAction.class);
+
+            doAnswer(invocation -> {
+                TestChatManager.Mocked.addDiscordMessage(message);
+
+                return null;
+            }).when(messageAction).queue();
+
+            return messageAction;
+        }
+
+        public static Message createMessage(String text) {
+            Message message = mock(Message.class);
+
+            when(message.getContentRaw()).thenReturn(text);
+
+            when(message.getContentDisplay()).thenReturn(text);
+
+            when(message.getContentStripped()).thenReturn(text);
+
+            return message;
         }
     }
 }

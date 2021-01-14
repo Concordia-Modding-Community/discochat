@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import ca.concordia.mccord.TestMod;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
 
 public class TestDiscordManager {
     public static class Mocked {
@@ -24,8 +25,10 @@ public class TestDiscordManager {
             when(discordManager.getChannelByName(anyString())).then(invocation -> {
                 String channelName = invocation.getArgument(0, String.class);
 
-                if (channelName.equals(TestChannel.Mocked.VALID_CHANNEL_NAME)) {
-                    return Optional.of(TestChannel.Mocked.create());
+                TextChannel textChannel = TestChannel.Mocked.createValid();
+
+                if (channelName.equals(textChannel.getName())) {
+                    return Optional.of(textChannel);
                 }
 
                 return Optional.empty();
@@ -34,7 +37,7 @@ public class TestDiscordManager {
             when(discordManager.getChannels()).then(invocation -> {
                 List<TextChannel> textChannels = new ArrayList<TextChannel>();
 
-                textChannels.add(TestChannel.Mocked.create());
+                textChannels.add(TestChannel.Mocked.createValid());
 
                 return textChannels;
             });
@@ -42,8 +45,10 @@ public class TestDiscordManager {
             when(discordManager.getUserByTag(anyString())).then(invocation -> {
                 String discordTag = invocation.getArgument(0, String.class);
 
-                if (discordTag.equals(TestUser.Mocked.getValidTag())) {
-                    return Optional.of(TestUser.Mocked.create());
+                User user = TestUser.Mocked.createValid();
+
+                if (discordTag.equals(user.getAsTag())) {
+                    return Optional.of(user);
                 }
 
                 return Optional.empty();
@@ -53,9 +58,10 @@ public class TestDiscordManager {
                 String discordName = invocation.getArgument(0, String.class);
                 String discordNumber = invocation.getArgument(1, String.class);
 
-                if (discordName.equals(TestUser.Mocked.VALID_DISCORD_NAME)
-                        && discordNumber.equals(TestUser.Mocked.VALID_DISCORD_NUMBER)) {
-                    return Optional.of(TestUser.Mocked.create());
+                User user = TestUser.Mocked.createValid();
+
+                if (discordName.equals(user.getName()) && discordNumber.equals(user.getAsTag().split("#")[1])) {
+                    return Optional.of(user);
                 }
 
                 return Optional.empty();
@@ -64,8 +70,10 @@ public class TestDiscordManager {
             when(discordManager.getUserFromUUID(anyString())).then(invocation -> {
                 String discordUUID = invocation.getArgument(0, String.class);
 
-                if (discordUUID.equals(TestUser.Mocked.VALID_DISCORD_UUID)) {
-                    return Optional.of(TestUser.Mocked.create());
+                User user = TestUser.Mocked.createValid();
+
+                if (discordUUID.equals(user.getId())) {
+                    return Optional.of(user);
                 }
 
                 return Optional.empty();

@@ -23,7 +23,7 @@ public class TestUserManager {
 
     @Test
     public void getPlayerEntityFromUser() {
-        User user = TestUser.Mocked.create();
+        User user = TestUser.Mocked.createValid();
 
         UserManager userManager = TestMod.Mocked.MOD.getUserManager();
 

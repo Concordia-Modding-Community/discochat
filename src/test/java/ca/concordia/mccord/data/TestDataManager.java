@@ -44,7 +44,7 @@ public class TestDataManager {
     public void testGetUserDataFromUser() {
         DataManager dataManager = TestMod.Mocked.MOD.getDataManager();
 
-        UserData userData = dataManager.getUserData(TestUser.Mocked.create()).get();
+        UserData userData = dataManager.getUserData(TestUser.Mocked.createValid()).get();
 
         assertEquals(TestPlayerEntity.Mocked.VALID_MC_UUID, userData.getMCUUID());
     }

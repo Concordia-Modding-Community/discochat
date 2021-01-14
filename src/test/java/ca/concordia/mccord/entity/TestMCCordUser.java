@@ -9,8 +9,8 @@ import ca.concordia.mccord.discord.TestUser;
 
 public class TestMCCordUser {
     public static class Mocked {
-        public static MCCordUser create() {
-            return new MCCordUser(TestPlayerEntity.Mocked.create(), TestUser.Mocked.create());
+        public static MCCordUser createValid() {
+            return new MCCordUser(TestPlayerEntity.Mocked.create(), TestUser.Mocked.createValid());
         }
     }
 
