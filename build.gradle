@@ -15,8 +15,8 @@ apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
 version = '1.0'
-group = 'ca.concordia.mccord' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = 'mccord'
+group = 'ca.concordia.discochat' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = 'discochat'
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
@@ -123,7 +123,7 @@ test {
 jar {
     manifest {
         attributes([
-            "Specification-Title": "mccord",
+            "Specification-Title": "discochat",
             "Specification-Vendor": "concordia",
             "Specification-Version": "1", // We are version 1 of ourselves
             "Implementation-Title": project.name,

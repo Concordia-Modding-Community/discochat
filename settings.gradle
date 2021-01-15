@@ -1,4 +1,4 @@
-rootProject.name = 'mccord'
+rootProject.name = 'discochat'
 
 include 'b4dis'
 include 'jddown'

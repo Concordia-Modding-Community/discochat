@@ -1,4 +1,4 @@
-# mccord
+# DiscoChat
 Minecraft 1.16 Discord Integration
 
 ![Repository Image](./images/repo_image.png)
@@ -19,7 +19,7 @@ We want to thank the Concordia University Part-time Faculty Association for the 
 To completely install the repo for development:
 
 ```bash
-git clone https://github.com/Concordia-Modding-Community/mccord
+git clone https://github.com/Concordia-Modding-Community/discochat
 git submodule init
 git submodule update
 ./gradlew genVsCodeRuns
