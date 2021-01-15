@@ -12,7 +12,7 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 
 public class CommandToken extends Command {
-    public static final ITextComponent SUCCESS = new StringTextComponent(TextFormatting.GREEN + "Discord token set.");
+    public static final ITextComponent SUCCESS = new StringTextComponent(TextFormatting.GREEN + "Discord Token Set and Discord Linked.");
 
     @Override
     public LiteralArgumentBuilder<CommandSource> getParser() {
@@ -25,6 +25,10 @@ public class CommandToken extends Command {
         String key = StringArgumentType.getString(commandContext, "key");
 
         getMod().getConfigManager().setDiscordToken(key);
+
+        getMod().getDiscordManager().connect();
+
+        getMod().getChatManager().notifyDiscord("DiscoChat Linked!");
 
         return SUCCESS;
     }

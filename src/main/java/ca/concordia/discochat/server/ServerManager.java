@@ -26,4 +26,8 @@ public class ServerManager extends AbstractManager {
     public Optional<MinecraftServer> getServer() {
         return Optional.ofNullable(this.server);
     }
+
+    public int getPlayerCount() {
+        return server.getCurrentPlayerCount();
+    }
 }

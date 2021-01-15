@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 
 import ca.concordia.discochat.TestMod;
-import ca.concordia.discochat.chat.text.ChannelTextComponent;
 import ca.concordia.discochat.discord.TestChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
 

@@ -1,6 +1,5 @@
 package ca.concordia.discochat;
 
-import ca.concordia.discochat.DiscoChatMod;
 import ca.concordia.discochat.chat.TestChatManager;
 import ca.concordia.discochat.data.TestDataManager;
 import ca.concordia.discochat.discord.TestDiscordManager;

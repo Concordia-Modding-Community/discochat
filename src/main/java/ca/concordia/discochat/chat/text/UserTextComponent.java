@@ -23,16 +23,11 @@ public class UserTextComponent extends TextComponent implements IModProvider {
 
         StringTextComponent stringText = new StringTextComponent(user.getMCName());
 
-        Style style = Style.EMPTY;
-
-        style = style.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                new StringTextComponent("Mention @" + user.getDiscordName())));
-
-        style = style.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, user.getDiscordAsMention()));
-
-        style = style.setColor(Color.fromInt(getUserHexColor(textChannel, user)));
-
-        stringText.setStyle(style);
+        stringText.setStyle(Style.EMPTY
+                .setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                        new StringTextComponent("Mention @" + user.getDiscordName())))
+                .setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, user.getDiscordAsMention()))
+                .setColor(Color.fromInt(getUserHexColor(textChannel, user))));
 
         siblings.add(stringText);
     }
@@ -44,16 +39,11 @@ public class UserTextComponent extends TextComponent implements IModProvider {
 
         StringTextComponent stringText = new StringTextComponent("@" + user.getMCName());
 
-        Style style = Style.EMPTY;
-
-        style = style.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                new StringTextComponent("Mention @" + user.getDiscordName())));
-
-        style = style.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, user.getDiscordAsMention()));
-
-        style = style.setColor(getMod().getConfigManager().getMentionColor());
-
-        stringText.setStyle(style);
+        stringText.setStyle(Style.EMPTY
+                .setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                        new StringTextComponent("Mention @" + user.getDiscordName())))
+                .setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, user.getDiscordAsMention()))
+                .setColor(getMod().getConfigManager().getMentionColor()));
 
         siblings.add(stringText);
     }

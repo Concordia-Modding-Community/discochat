@@ -1,6 +1,5 @@
 package ca.concordia.discochat.commands;
 
-import com.mojang.authlib.exceptions.AuthenticationException;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;

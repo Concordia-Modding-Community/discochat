@@ -13,8 +13,6 @@ import ca.concordia.discochat.entity.ModUser;
 import ca.concordia.discochat.entity.TestModUser;
 import ca.concordia.discochat.entity.TestPlayerEntity;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
 
 public class TestChatMessage {
     @Test
@@ -31,19 +29,12 @@ public class TestChatMessage {
 
         assertNotNull(user.getDiscordAsMention());
 
-        assertEquals(
-                new FormatTextComponent(TestMod.Mocked.MOD.getConfigManager().getDiscordTextFormat(),
-                        new String[] { "m", "p" },
-                        new ITextComponent[] { new StringTextComponent(text),
-                                new StringTextComponent(user.getDiscordName()) }).getString(),
-                chatMessage.getDiscordText());
+        assertEquals(new FormatTextComponent(TestMod.Mocked.MOD.getConfigManager().getDiscordTextFormat())
+                .put("m", text).put("p", user.getDiscordName()).build().getString(), chatMessage.getDiscordText());
 
         assertEquals(
-                new FormatTextComponent(TestMod.Mocked.MOD.getConfigManager().getMCTextFormat(),
-                        new String[] { "c", "m", "p" },
-                        new ITextComponent[] { new StringTextComponent("#" + channel.getName()),
-                                new StringTextComponent(text), new StringTextComponent(user.getMCName()) })
-                                        .getString(),
+                new FormatTextComponent(TestMod.Mocked.MOD.getConfigManager().getMCTextFormat())
+                        .put("c", "#" + channel.getName()).put("m", text).put("p", user.getMCName()).build().getString(),
                 chatMessage.getMCText(TestPlayerEntity.Mocked.create()).getString());
     }
 }

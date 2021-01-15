@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import ca.concordia.discochat.TestMod;
-import ca.concordia.discochat.chat.text.URLTextComponent;
 
 public class TestURLTextComponent {
     @Test

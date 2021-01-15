@@ -12,7 +12,6 @@ import java.util.Optional;
 import org.junit.Test;
 
 import ca.concordia.discochat.TestMod;
-import ca.concordia.discochat.discord.DiscordManager;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 

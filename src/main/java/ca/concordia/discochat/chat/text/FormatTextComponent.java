@@ -10,19 +10,28 @@ import net.minecraft.util.text.TextComponent;
 
 public class FormatTextComponent extends TextComponent {
     private static Pattern PATTERN = Pattern.compile("@([a-zA-Z_]*)");
+    private HashMap<String, ITextComponent> hashMap;
+    private String format;
 
-    public FormatTextComponent(String pattern, String[] keys, ITextComponent[] values) {
-        HashMap<String, ITextComponent> hashMap = new HashMap<String, ITextComponent>();
+    public FormatTextComponent(String format) {
+        this.hashMap = new HashMap<String, ITextComponent>();
+        this.format = format;
+    }
 
-        if (keys.length != values.length) {
-            throw new RuntimeException("Key size does not match value size.");
-        }
+    public FormatTextComponent put(String key, ITextComponent value) {
+        hashMap.put(key, value);
 
-        for(int i = 0; i < keys.length; i++) {
-            hashMap.put(keys[i], values[i]);
-        }
+        return this;
+    }
 
-        Matcher matcher = PATTERN.matcher(pattern);
+    public FormatTextComponent put(String key, String value) {
+        hashMap.put(key, new StringTextComponent(value));
+
+        return this;
+    }
+
+    public FormatTextComponent build() {
+        Matcher matcher = PATTERN.matcher(format);
 
         int pointer = 0;
 
@@ -30,7 +39,7 @@ public class FormatTextComponent extends TextComponent {
             int start = matcher.start();
 
             if (pointer < start) {
-                siblings.add(new StringTextComponent(pattern.substring(pointer, start)));
+                siblings.add(new StringTextComponent(format.substring(pointer, start)));
             }
 
             siblings.add(hashMap.get(matcher.group(1)));
@@ -38,9 +47,11 @@ public class FormatTextComponent extends TextComponent {
             pointer = matcher.end();
         }
 
-        if (pointer < pattern.length()) {
-            siblings.add(new StringTextComponent(pattern.substring(pointer)));
+        if (pointer < format.length()) {
+            siblings.add(new StringTextComponent(format.substring(pointer)));
         }
+
+        return this;
     }
 
     @Override

@@ -52,8 +52,7 @@ public class ChatManager extends AbstractManager {
 
     public void broadcastAll(Optional<ServerPlayerEntity> playerEntity, String channelName, String message)
             throws Exception {
-        ModUser user = ModUser.fromMCPlayerEntity(getMod(), playerEntity)
-                .orElseThrow(AuthenticationException::new);
+        ModUser user = ModUser.fromMCPlayerEntity(getMod(), playerEntity).orElseThrow(AuthenticationException::new);
 
         broadcastAll(user, channelName, message);
     }
@@ -61,7 +60,8 @@ public class ChatManager extends AbstractManager {
     public void broadcastAll(ModUser user, String channelName, String message) throws Exception {
         TextChannel textChannel = getMod().getDiscordManager().getChannelByName(channelName).get();
 
-        ChatMessage chatMessage = new ChatMessage(getMod(), user, textChannel, new DiscordTextComponent(getMod(), message));
+        ChatMessage chatMessage = new ChatMessage(getMod(), user, textChannel,
+                new DiscordTextComponent(getMod(), message));
 
         broadcastAll(chatMessage);
     }
@@ -78,12 +78,12 @@ public class ChatManager extends AbstractManager {
 
     public void broadcastDiscord(Optional<ServerPlayerEntity> playerEntity, String channelName, String message)
             throws Exception {
-        ModUser user = ModUser.fromMCPlayerEntity(getMod(), playerEntity)
-                .orElseThrow(AuthenticationException::new);
+        ModUser user = ModUser.fromMCPlayerEntity(getMod(), playerEntity).orElseThrow(AuthenticationException::new);
 
         TextChannel textChannel = getMod().getDiscordManager().getChannelByName(channelName).get();
 
-        ChatMessage chatMessage = new ChatMessage(getMod(), user, textChannel, new DiscordTextComponent(getMod(), message));
+        ChatMessage chatMessage = new ChatMessage(getMod(), user, textChannel,
+                new DiscordTextComponent(getMod(), message));
 
         broadcastDiscord(chatMessage);
     }
@@ -93,6 +93,17 @@ public class ChatManager extends AbstractManager {
 
         if (chatMessage.getUser().isChannelVisible(textChannel)) {
             textChannel.sendMessage(chatMessage.getDiscordText()).queue();
+        }
+    }
+
+    public void notifyDiscord(String message) {
+        try {
+            TextChannel textChannel = getMod().getDiscordManager()
+                    .getChannelByName(getMod().getConfigManager().getNotificationChannel()).get();
+
+            textChannel.sendMessage(message).queue();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

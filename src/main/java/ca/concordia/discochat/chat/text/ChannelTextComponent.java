@@ -3,11 +3,9 @@ package ca.concordia.discochat.chat.text;
 import ca.concordia.discochat.utils.IMod;
 import ca.concordia.discochat.utils.IModProvider;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.minecraft.util.text.Color;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponent;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
 
@@ -27,17 +25,12 @@ public class ChannelTextComponent extends TextComponent implements IModProvider 
     private void parse(TextChannel textChannel) {
         StringTextComponent stringText = new StringTextComponent("#" + textChannel.getName());
 
-        Style style = Style.EMPTY;
-
-        style = style.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                new StringTextComponent("Switch to #" + textChannel.getName())));
-
-        style = style.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
-                "/" + getMod().getConfigManager().getMCCommandPrefix() + " switch " + textChannel.getName()));
-
-        style = style.setColor(getMod().getConfigManager().getMentionColor());
-
-        stringText.setStyle(style);
+        stringText.setStyle(Style.EMPTY
+                .setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                        new StringTextComponent("Switch to #" + textChannel.getName())))
+                .setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
+                        "/" + getMod().getConfigManager().getMCCommandPrefix() + " switch " + textChannel.getName()))
+                .setColor(getMod().getConfigManager().getMentionColor()));
 
         siblings.add(stringText);
     }

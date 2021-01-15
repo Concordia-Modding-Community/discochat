@@ -16,17 +16,9 @@ public class URLTextComponent extends TextComponent implements IModProvider {
 
         StringTextComponent stringText = new StringTextComponent(url);
 
-        Style style = Style.EMPTY;
-
-        style = style.setColor(getMod().getConfigManager().getMentionColor());
-
-        style = style.setUnderlined(true);
-
-        style = style.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, url));
-
-        style = style.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new StringTextComponent("Open URL")));
-
-        stringText.setStyle(style);
+        stringText.setStyle(Style.EMPTY.setColor(getMod().getConfigManager().getMentionColor()).setUnderlined(true)
+                .setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, url))
+                .setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new StringTextComponent("Open URL"))));
 
         siblings.add(stringText);
     }

@@ -6,7 +6,6 @@ import org.junit.Test;
 
 import ca.concordia.discochat.TestMod;
 import ca.concordia.discochat.discord.TestUser;
-import ca.concordia.discochat.entity.UserManager;
 import net.dv8tion.jda.api.entities.User;
 import net.minecraft.entity.player.ServerPlayerEntity;
 

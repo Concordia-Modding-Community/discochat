@@ -81,15 +81,15 @@ public class DiscoChatMod implements IMod {
     }
 
     private void onServerStarted(final FMLServerStartedEvent event) {
+        discordManager.register();
         serverManager.register(event.getServer());
         dataManager.register(event.getServer());
-        discordManager.register();
     }
 
     private void onServerStopped(final FMLServerStoppedEvent event) {
-        discordManager.unregister();
         dataManager.unregister();
         serverManager.unregister();
+        discordManager.unregister();
     }
 
     @Override

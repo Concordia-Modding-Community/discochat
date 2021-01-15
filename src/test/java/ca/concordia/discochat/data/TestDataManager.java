@@ -7,8 +7,6 @@ import static org.mockito.Mockito.spy;
 import org.junit.Test;
 
 import ca.concordia.discochat.TestMod;
-import ca.concordia.discochat.data.DataManager;
-import ca.concordia.discochat.data.UserData;
 import ca.concordia.discochat.discord.TestChannel;
 import ca.concordia.discochat.discord.TestUser;
 import ca.concordia.discochat.entity.TestPlayerEntity;

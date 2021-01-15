@@ -25,6 +25,8 @@ public class ConfigManager extends AbstractManager {
 
     private ForgeConfigSpec.ConfigValue<String> DEFAULT_CHANNEL;
 
+    private ForgeConfigSpec.ConfigValue<String> NOTIFICATION_CHANNEL;
+
     private ForgeConfigSpec.ConfigValue<String> DISCORD_COMMAND_PREFIX;
 
     private ForgeConfigSpec.ConfigValue<String> DISCORD_TEXT_FORMAT;
@@ -32,6 +34,14 @@ public class ConfigManager extends AbstractManager {
     private final String CATEGORY_DISCORD_ROLE = "role";
 
     private ForgeConfigSpec.ConfigValue<String> DISCORD_ADMIN_ROLE;
+
+    private final String CATEGORY_DISCORD_MESSAGE = "message";
+
+    private ForgeConfigSpec.ConfigValue<String> DISCORD_PLAYER_JOIN;
+
+    private ForgeConfigSpec.ConfigValue<String> DISCORD_PLAYER_LEFT;
+
+    private ForgeConfigSpec.ConfigValue<String> DISCORD_PLAYER_ADVANCEMENT;
 
     public ConfigManager(IMod mod) {
         super(mod);
@@ -49,13 +59,15 @@ public class ConfigManager extends AbstractManager {
         builder.comment("General Settings").push(CATEGORY_GENERAL);
 
         // TODO: Better save location.
-        DATA_LOCATION = builder.comment("DiscoChat NBT Data Location (relative to server path)").define("dataLocation", "./config/discochat.dat");
+        DATA_LOCATION = builder.comment("DiscoChat NBT Data Location (relative to server path)").define("dataLocation",
+                "./config/discochat.dat");
 
         MENTION_COLOR_HEX = builder.comment("DiscoChat Discord Mention Hex Color").define("mentionColor", "#7289da");
 
         MC_COMMAND_PREFIX = builder.comment("DiscoChat Command Prefix").define("commandPrefix", "discord");
 
-        MC_TEXT_FORMAT = builder.comment("DiscoChat Ingame Text Format (@c = command, @p = player, @m = message)").define("textFormat", "<@c | @p> @m");
+        MC_TEXT_FORMAT = builder.comment("DiscoChat Ingame Text Format (@c = command, @p = player, @m = message)")
+                .define("textFormat", "<@c | @p> @m");
 
         builder.pop();
     }
@@ -70,13 +82,19 @@ public class ConfigManager extends AbstractManager {
 
         DISCORD_API_KEY = builder.comment("Discord Bot API Key").define("apiKey", "");
 
-        DEFAULT_CHANNEL = builder.comment("Minecraft Default Discord Channel").define("defaultChannel", "general");
+        DEFAULT_CHANNEL = builder.comment("Default channel for Minecraft chat").define("defaultChannel", "general");
+
+        NOTIFICATION_CHANNEL = builder.comment("Channel for Minecraft notification").define("notificationChannel",
+                "general");
 
         DISCORD_COMMAND_PREFIX = builder.comment("Discord Command Prefix").define("commandPrefix", "!");
 
-        DISCORD_TEXT_FORMAT = builder.comment("Discord Command Text Format (@p = player, @m = message)").define("textFormat", "@p  @m");
+        DISCORD_TEXT_FORMAT = builder.comment("Discord Command Text Format (@p = player, @m = message)")
+                .define("textFormat", "@p  @m");
 
         buildDiscordRolesConfig(builder);
+
+        buildDiscordMessagesConfig(builder);
 
         builder.pop();
     }
@@ -85,6 +103,22 @@ public class ConfigManager extends AbstractManager {
         builder.comment("Discord Roles").push(CATEGORY_DISCORD_ROLE);
 
         DISCORD_ADMIN_ROLE = builder.comment("Discord Admin Role").define("adminRole", "administrator");
+
+        builder.pop();
+    }
+
+    private void buildDiscordMessagesConfig(ForgeConfigSpec.Builder builder) {
+        builder.comment("Discord Messags").push(CATEGORY_DISCORD_MESSAGE);
+
+        DISCORD_PLAYER_JOIN = builder.comment("Message for Player Joining (@p = player)").define("playerJoin",
+                "@p joined.");
+
+        DISCORD_PLAYER_LEFT = builder.comment("Message for Player Leaving (@p = player)").define("playerLeft",
+                "@p left.");
+
+        DISCORD_PLAYER_ADVANCEMENT = builder.comment(
+                "Message for Player Advancement (@p = player, @t = advancement title, @d = advancement description)")
+                .define("playerAdvancement", "@p has made the advancement **@t**\n*@d*");
 
         builder.pop();
     }
@@ -153,6 +187,22 @@ public class ConfigManager extends AbstractManager {
 
     public String getDiscordTextFormat() {
         return DISCORD_TEXT_FORMAT.get();
+    }
+
+    public String getNotificationChannel() {
+        return NOTIFICATION_CHANNEL.get();
+    }
+
+    public String getPlayerJoinMessage() {
+        return DISCORD_PLAYER_JOIN.get();
+    }
+
+    public String getPlayerLeaveMessage() {
+        return DISCORD_PLAYER_LEFT.get();
+    }
+
+    public String getPlayerAdvancementMessage() {
+        return DISCORD_PLAYER_ADVANCEMENT.get();
     }
 
     public boolean isDiscordTokenValid() {

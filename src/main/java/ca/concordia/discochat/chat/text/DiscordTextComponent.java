@@ -45,19 +45,10 @@ public class DiscordTextComponent extends TextComponent implements IModProvider 
 
                 TextFormattingFragment formattingFragment = (TextFormattingFragment) fragment;
 
-                TextFormattingFragment.Style fStyle = formattingFragment.getStyle();
+                TextFormattingFragment.Style style = formattingFragment.getStyle();
 
-                Style style = Style.EMPTY;
-
-                style = style.setBold(fStyle.isBold());
-
-                style = style.setItalic(fStyle.isItalic());
-
-                style = style.setStrikethrough(fStyle.isStrikethrough());
-
-                style = style.setUnderlined(fStyle.isUnderline());
-
-                stringText.setStyle(style);
+                stringText.setStyle(Style.EMPTY.setBold(style.isBold()).setItalic(style.isItalic())
+                        .setStrikethrough(style.isStrikethrough()).setUnderlined(style.isUnderline()));
 
                 siblings.add(stringText);
             } else if (fragment instanceof URLFragment) {
@@ -102,7 +93,7 @@ public class DiscordTextComponent extends TextComponent implements IModProvider 
 
                 String emoji;
 
-                switch(emojiFragment.getText()) {
+                switch (emojiFragment.getText()) {
                     case "skull":
                         emoji = "☠";
                         break;

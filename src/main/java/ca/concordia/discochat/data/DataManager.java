@@ -140,7 +140,12 @@ public class DataManager extends AbstractManager implements INBTSerializable<Com
 
         try {
             if (!file.exists()) {
-                file.mkdirs();
+                File parent = file.getParentFile();
+
+                if (parent.isDirectory()) {
+                    parent.getParentFile().mkdirs();
+                }
+                
                 file.createNewFile();
             }
 

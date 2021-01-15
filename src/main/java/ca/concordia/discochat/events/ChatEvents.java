@@ -22,7 +22,7 @@ public class ChatEvents extends AbstractManager {
         bus.addListener(EventPriority.NORMAL, this::onServerChat);
     }
 
-    private void onServerChat(ServerChatEvent event) {
+    public void onServerChat(ServerChatEvent event) {
         if (!getMod().getDiscordManager().isConnected()) {
             event.setCanceled(false);
 

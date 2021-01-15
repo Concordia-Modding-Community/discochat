@@ -22,17 +22,11 @@ public class RoleTextComponent extends TextComponent implements IModProvider {
 
         StringTextComponent stringText = new StringTextComponent("@" + role.getName());
 
-        Style style = Style.EMPTY;
-
-        style = style.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                new StringTextComponent("Mention Role @" + role.getName())));
-
-        style = style.setClickEvent(
-                new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, role.getAsMention()));
-
-        style = style.setColor(Color.fromInt(role.getColor().getRGB()));
-
-        stringText.setStyle(style);
+        stringText.setStyle(Style.EMPTY
+                .setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                        new StringTextComponent("Mention Role @" + role.getName())))
+                .setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, role.getAsMention()))
+                .setColor(Color.fromInt(role.getColor().getRGB())));
 
         siblings.add(stringText);
     }
@@ -47,5 +41,5 @@ public class RoleTextComponent extends TextComponent implements IModProvider {
         // TODO Auto-generated method stub
         return null;
     }
-    
+
 }

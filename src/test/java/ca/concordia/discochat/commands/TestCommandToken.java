@@ -10,7 +10,6 @@ import org.junit.Test;
 
 import ca.concordia.discochat.TestMod;
 import ca.concordia.discochat.chat.TestChatManager;
-import ca.concordia.discochat.commands.CommandToken;
 import net.minecraft.command.CommandSource;
 
 public class TestCommandToken {

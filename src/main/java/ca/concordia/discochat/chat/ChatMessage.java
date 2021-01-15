@@ -1,7 +1,5 @@
 package ca.concordia.discochat.chat;
 
-import java.util.List;
-
 import ca.concordia.discochat.chat.text.ChannelTextComponent;
 import ca.concordia.discochat.chat.text.DiscordTextComponent;
 import ca.concordia.discochat.chat.text.FormatTextComponent;
@@ -36,9 +34,12 @@ public class ChatMessage implements IModProvider {
     }
 
     public String getDiscordText() {
-        return new FormatTextComponent(getMod().getConfigManager().getDiscordTextFormat(), new String[] { "m", "p" },
-                new ITextComponent[] { new StringTextComponent(message.getDiscordString()),
-                        new StringTextComponent(user.getDiscordName()) }).getString();
+        StringTextComponent discordMessage = new StringTextComponent(message.getDiscordString());
+
+        StringTextComponent discordName = new StringTextComponent(user.getDiscordName());
+
+        return new FormatTextComponent(getMod().getConfigManager().getDiscordTextFormat()).put("m", discordMessage)
+                .put("p", discordName).build().getString();
     }
 
     public ITextComponent getMCText(PlayerEntity playerEntity) {
@@ -50,9 +51,8 @@ public class ChatMessage implements IModProvider {
             style = style.setColor(Color.fromTextFormatting(TextFormatting.YELLOW));
         }
 
-        FormatTextComponent fullText = new FormatTextComponent(mod.getConfigManager().getMCTextFormat(),
-                new String[] { "c", "m", "p" },
-                new ITextComponent[] { new ChannelTextComponent(mod, textChannel), message, userText });
+        FormatTextComponent fullText = new FormatTextComponent(mod.getConfigManager().getMCTextFormat())
+                .put("c", new ChannelTextComponent(mod, textChannel)).put("m", message).put("p", userText).build();
 
         fullText.setStyle(style);
 

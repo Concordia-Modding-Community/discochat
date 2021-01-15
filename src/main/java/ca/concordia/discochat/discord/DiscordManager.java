@@ -9,6 +9,7 @@ import ca.concordia.discochat.utils.AbstractManager;
 import ca.concordia.discochat.utils.IMod;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.Role;
@@ -195,5 +196,13 @@ public class DiscordManager extends AbstractManager {
 
     public int getUserHexColor(User user, TextChannel textChannel) {
         return textChannel.getGuild().getMember(user).getColor().getRGB();
+    }
+
+    public void updateActivity() {
+        try {
+            jda.get().getPresence()
+                    .setActivity(Activity.playing(getMod().getServerManager().getPlayerCount() + " player(s) Online"));
+        } catch (Exception e) {
+        }
     }
 }
