@@ -90,7 +90,7 @@ public class PlayerEvents extends AbstractManager {
             finalText.append(new StringTextComponent("[More Help?]").setStyle(Style.EMPTY
                     .setColor(Color.fromTextFormatting(TextFormatting.YELLOW)).setUnderlined(true)
                     .setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
-                            "/" + getMod().getConfigManager().getMCCommandPrefix()))
+                            "/" + getMod().getConfigManager().getMCCommandPrefix() + " help"))
                     .setHoverEvent(
                             new HoverEvent(HoverEvent.Action.SHOW_TEXT, new StringTextComponent("Click here.")))));
         } else {
@@ -125,7 +125,7 @@ public class PlayerEvents extends AbstractManager {
             finalText.append(new StringTextComponent("[More Help?]").setStyle(Style.EMPTY
                     .setColor(Color.fromTextFormatting(TextFormatting.YELLOW)).setUnderlined(true)
                     .setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
-                            "/" + getMod().getConfigManager().getMCCommandPrefix()))
+                            "/" + getMod().getConfigManager().getMCCommandPrefix() + " help"))
                     .setHoverEvent(
                             new HoverEvent(HoverEvent.Action.SHOW_TEXT, new StringTextComponent("Click here.")))));
         }
