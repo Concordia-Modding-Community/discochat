@@ -234,6 +234,6 @@ public class ConfigManager extends AbstractManager {
     }
 
     public boolean isDiscordTokenValid() {
-        return !getDiscordToken().isBlank();
+        return !getDiscordToken().isEmpty();
     }
 }

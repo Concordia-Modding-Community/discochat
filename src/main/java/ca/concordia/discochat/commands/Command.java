@@ -105,7 +105,7 @@ public abstract class Command implements ICommand<CommandSource, ITextComponent>
     public Optional<ServerPlayerEntity> getSourcePlayer(CommandContext<CommandSource> commandContext) {
         Optional<Entity> oEntity = Optional.ofNullable(commandContext.getSource().getEntity());
 
-        if (oEntity.isEmpty()) {
+        if (!oEntity.isPresent()) {
             return Optional.empty();
         }
 

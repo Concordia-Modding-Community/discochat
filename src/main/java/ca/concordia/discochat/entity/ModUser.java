@@ -106,7 +106,7 @@ public class ModUser {
     public String getCurrentChannel() {
         String channel = this.getUserData().get().getCurrentChannel();
 
-        if (channel.isBlank()) {
+        if (channel.isEmpty()) {
             return getMod().getConfigManager().getDefaultChannel();
         }
 

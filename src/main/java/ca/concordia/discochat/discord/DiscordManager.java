@@ -71,7 +71,7 @@ public class DiscordManager extends AbstractManager {
                 throw new Exception("JDA already connected.");
             }
 
-            if (token.isBlank()) {
+            if (token.isEmpty()) {
                 throw new Exception("Invalid token.");
             }
 

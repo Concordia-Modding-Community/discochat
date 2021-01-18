@@ -105,7 +105,7 @@ public class DataManager extends AbstractManager implements INBTSerializable<Com
 
         userData.setMCUUID(mcUUID);
 
-        if (!userData.getDiscordUUID().isBlank()) {
+        if (!userData.getDiscordUUID().isEmpty()) {
             discordMappingNBT.putString(userData.getDiscordUUID(), mcUUID);
         }
 
