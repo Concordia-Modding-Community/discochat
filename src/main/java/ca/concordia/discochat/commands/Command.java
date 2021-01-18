@@ -88,11 +88,11 @@ public abstract class Command implements ICommand<CommandSource, ITextComponent>
         }
     }
 
-    private void sendFeedback(CommandContext<CommandSource> commandContext, ITextComponent message) {
+    protected void sendFeedback(CommandContext<CommandSource> commandContext, ITextComponent message) {
         commandContext.getSource().sendFeedback(message, true);
     }
 
-    private void sendErrorMessage(CommandContext<CommandSource> commandContext, ITextComponent message) {
+    protected void sendErrorMessage(CommandContext<CommandSource> commandContext, ITextComponent message) {
         commandContext.getSource().sendErrorMessage(message);
     }
 

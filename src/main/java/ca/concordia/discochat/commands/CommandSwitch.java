@@ -21,27 +21,33 @@ public class CommandSwitch extends Command {
     public LiteralArgumentBuilder<CommandSource> getParser() {
         return Commands.literal("switch")
                 .then(Commands.argument("channel", StringArgumentType.word()).suggests(
-                        (context, builder) -> getMod().getCommandSuggestions().getVisibleChannels(context, builder))
+                        (context, builder) -> getMod().getCommandSuggestions().getAccessibleChannels(context, builder))
                         .executes(context -> execute(context, this::defaultExecute)));
     }
 
-    protected ITextComponent defaultExecute(CommandContext<CommandSource> commandContext) throws CommandException {
-        String channel = StringArgumentType.getString(commandContext, "channel");
+    protected ITextComponent defaultExecute(CommandContext<CommandSource> context) throws CommandException {
+        String channel = StringArgumentType.getString(context, "channel");
 
         try {
-            ModUser getUser = getSourceUser(commandContext).get();
+            ModUser user = getSourceUser(context).get();
 
             TextChannel textChannel = getMod().getDiscordManager().getChannelByName(channel).get();
 
-            getUser.setCurrentChannel(channel);
+            if (!user.isChannelAccessible(textChannel)) {
+                throw new RuntimeException("Channel not accessible.");
+            }
 
-            Style style = Style.EMPTY;
+            if (!user.isChannelVisible(textChannel)) {
+                sendFeedback(context, new StringTextComponent(TextFormatting.YELLOW + "You are switching to a channel that you are not listening to."));
+            }
 
-            style = style.setColor(Color.fromTextFormatting(TextFormatting.GREEN));
+            user.setCurrentChannel(channel);
+
+            Style style = Style.EMPTY.setColor(Color.fromTextFormatting(TextFormatting.GREEN));
 
             return new StringTextComponent("Switched to ").setStyle(style)
                     .append(new ChannelTextComponent(getMod(), textChannel))
-                    .append(new StringTextComponent(".").setStyle(style));
+                    .appendString(".");
         } catch (Exception e) {
             throw new CommandException(new StringTextComponent(TextFormatting.RED + "Unable to find channel "
                     + TextFormatting.BOLD + "#" + channel + TextFormatting.RESET + "" + TextFormatting.RED + "."));

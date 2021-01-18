@@ -91,7 +91,7 @@ public class ChatManager extends AbstractManager {
     public void broadcastDiscord(ChatMessage chatMessage) throws Exception {
         TextChannel textChannel = chatMessage.getTextChannel();
 
-        if (chatMessage.getUser().isChannelVisible(textChannel)) {
+        if (chatMessage.getUser().isChannelAccessible(textChannel)) {
             textChannel.sendMessage(chatMessage.getDiscordText()).queue();
         }
     }

@@ -4,7 +4,6 @@ import ca.concordia.discochat.entity.ModUser;
 import ca.concordia.discochat.utils.IMod;
 import ca.concordia.discochat.utils.IModProvider;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.minecraft.util.text.Color;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponent;
@@ -27,7 +26,7 @@ public class UserTextComponent extends TextComponent implements IModProvider {
                 .setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                         new StringTextComponent("Mention @" + user.getDiscordName())))
                 .setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, user.getDiscordAsMention()))
-                .setColor(Color.fromInt(getUserHexColor(textChannel, user))));
+                .setColor(net.minecraft.util.text.Color.fromInt(getUserHexColor(textChannel, user))));
 
         siblings.add(stringText);
     }
@@ -64,6 +63,12 @@ public class UserTextComponent extends TextComponent implements IModProvider {
     }
 
     private int getUserHexColor(TextChannel textChannel, ModUser user) {
-        return textChannel.getGuild().getMemberById(user.getDiscordUUID()).getColor().getRGB();
+        java.awt.Color color = textChannel.getGuild().getMemberById(user.getDiscordUUID()).getColor();
+        
+        if (color == null) {
+            return java.awt.Color.WHITE.getRGB();
+        }
+
+        return color.getRGB();
     }
 }

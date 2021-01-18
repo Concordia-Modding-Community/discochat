@@ -66,4 +66,8 @@ public class ChatMessage implements IModProvider {
     public ModUser getUser() {
         return this.user;
     }
+
+    public boolean isAuthor(ModUser modUser) {
+        return this.user.equals(modUser);
+    }
 }

@@ -31,8 +31,8 @@ public class CommandSuggestions {
         List<String> channels = new ArrayList<String>();
 
         try {
-            List<TextChannel> textChannels = ModUser.fromMCPlayerEntity(getMod(), context.getSource().asPlayer())
-                    .get().getAccessibleChannels();
+            List<TextChannel> textChannels = ModUser.fromMCPlayerEntity(getMod(), context.getSource().asPlayer()).get()
+                    .getAccessibleChannels();
 
             channels = textChannels.stream().map(channel -> channel.getName()).collect(Collectors.toList());
         } catch (Exception e) {
@@ -47,8 +47,24 @@ public class CommandSuggestions {
         List<String> channels = new ArrayList<String>();
 
         try {
-            List<TextChannel> textChannels = ModUser.fromMCPlayerEntity(getMod(), context.getSource().asPlayer())
-                    .get().getVisibleChannels();
+            List<TextChannel> textChannels = ModUser.fromMCPlayerEntity(getMod(), context.getSource().asPlayer()).get()
+                    .getVisibleChannels();
+
+            channels = textChannels.stream().map(channel -> channel.getName()).collect(Collectors.toList());
+        } catch (Exception e) {
+        }
+
+        return ISuggestionProvider.suggest(channels.toArray(new String[0]), builder);
+    }
+
+    // TODO: Prevent code duplicate.
+    public CompletableFuture<Suggestions> getInvisibleChannels(CommandContext<CommandSource> context,
+            SuggestionsBuilder builder) {
+        List<String> channels = new ArrayList<String>();
+
+        try {
+            List<TextChannel> textChannels = ModUser.fromMCPlayerEntity(getMod(), context.getSource().asPlayer()).get()
+                    .getInvisibleChannels();
 
             channels = textChannels.stream().map(channel -> channel.getName()).collect(Collectors.toList());
         } catch (Exception e) {

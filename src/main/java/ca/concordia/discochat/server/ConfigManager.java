@@ -67,7 +67,7 @@ public class ConfigManager extends AbstractManager {
         MC_COMMAND_PREFIX = builder.comment("DiscoChat Command Prefix").define("commandPrefix", "discord");
 
         MC_TEXT_FORMAT = builder.comment("DiscoChat Ingame Text Format (@c = command, @p = player, @m = message)")
-                .define("textFormat", "<@c | @p> @m");
+                .define("textFormat", "<@p | @c> @m");
 
         builder.pop();
     }
@@ -203,6 +203,22 @@ public class ConfigManager extends AbstractManager {
 
     public String getPlayerAdvancementMessage() {
         return DISCORD_PLAYER_ADVANCEMENT.get();
+    }
+
+    public void setMCTextFormat(String textFormat) {
+        MC_TEXT_FORMAT.set(textFormat);
+    }
+
+    public void setDiscordTextFormat(String textFormat) {
+        DISCORD_TEXT_FORMAT.set(textFormat);
+    }
+
+    public void setMentionColor(String hex) {
+        MENTION_COLOR_HEX.set(hex);
+    }
+
+    public void setDataPath(String path) {
+        DATA_LOCATION.set(path);
     }
 
     public boolean isDiscordTokenValid() {

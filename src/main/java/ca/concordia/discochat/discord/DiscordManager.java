@@ -3,6 +3,9 @@ package ca.concordia.discochat.discord;
 import java.util.List;
 import java.util.Optional;
 
+import com.mojang.brigadier.CommandDispatcher;
+
+import ca.concordia.b4dis.CommandSourceDiscord;
 import ca.concordia.b4dis.DiscordBrigadier;
 import ca.concordia.discochat.discord.commands.DiscordCommandManager;
 import ca.concordia.discochat.utils.AbstractManager;
@@ -34,6 +37,10 @@ public class DiscordManager extends AbstractManager {
                 message -> handleMessage(message));
 
         this.discordCommandManager = new DiscordCommandManager(mod);
+    }
+
+    public CommandDispatcher<CommandSourceDiscord> getDispatcher() {
+        return discordBrigadier.getDispatcher();
     }
 
     public DiscordManager register() {

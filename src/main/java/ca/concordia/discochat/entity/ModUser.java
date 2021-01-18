@@ -184,15 +184,13 @@ public class ModUser {
             }
 
             if (userData.getHiddenChannels().contains(UserData.ANY_CHANNEL)) {
-                throw new Exception("No visible channel");
+                throw new Exception("All channels set inivisible");
             }
 
             if (userData.getHiddenChannels().contains(channel.getName())) {
                 throw new Exception("Channel not set visibile");
             }
         } catch (Exception e) {
-            e.printStackTrace();
-
             return false;
         }
 
@@ -217,6 +215,15 @@ public class ModUser {
         }
     }
 
+    public List<TextChannel> getInvisibleChannels() {
+        try {
+            return getMod().getDiscordManager().getChannels().get().stream()
+                    .filter(channel -> !this.isChannelVisible(channel)).collect(Collectors.toList());
+        } catch (Exception e) {
+            return new ArrayList<TextChannel>();
+        }
+    }
+
     public void sendDiscordMessage(ITextComponent text) {
         this.user.openPrivateChannel().flatMap(channel -> channel.sendMessage(text.toString())).queue();
     }
@@ -228,7 +235,7 @@ public class ModUser {
     public void sendMCMessage(ChatMessage chatMessage) {
         TextChannel textChannel = chatMessage.getTextChannel();
 
-        if (isChannelVisible(textChannel)) {
+        if (chatMessage.isAuthor(this) || isChannelVisible(textChannel)) {
             this.sendMCMessage(chatMessage.getMCText(playerEntity));
         }
     }
@@ -251,5 +258,16 @@ public class ModUser {
 
     public String getMCUUID() {
         return playerEntity.getUniqueID().toString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(!(obj instanceof ModUser)) {
+            return false;
+        }
+
+        ModUser user = (ModUser) obj;
+
+        return this.getMCUUID().equals(user.getMCUUID());
     }
 }

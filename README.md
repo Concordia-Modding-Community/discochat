@@ -25,7 +25,9 @@ git submodule update
 ./gradlew genVsCodeRuns
 ```
 
-Then in-game, don't forget to put your Discord bot token:
+Add a new Discord bot to your Discord server as Administrator (8). Don't forget to activate the `Privileged Gateway Intents`.
+
+In game chat, don't forget to put your Discord bot token:
 
 ```bash
 /discord token BOT_TOKEN
