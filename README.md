@@ -19,7 +19,7 @@ We want to thank the Concordia University Part-time Faculty Association for the 
 To completely install the repo for development:
 
 ```bash
-git clone https://github.com/Concordia-Modding-Community/discochat
+git clone https://github.com/Concordia-Modding-Community/mccord
 git submodule init
 git submodule update
 ./gradlew genVsCodeRuns
