@@ -16,6 +16,7 @@ import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
+import net.minecraftforge.client.event.ScreenshotEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.AdvancementEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
@@ -33,6 +34,7 @@ public class PlayerEvents extends AbstractManager {
         bus.addListener(EventPriority.NORMAL, this::onPlayerLeave);
         bus.addListener(EventPriority.NORMAL, this::onPlayerDeath);
         bus.addListener(EventPriority.NORMAL, this::onPlayerAdvancement);
+        bus.addListener(EventPriority.NORMAL, this::onScreenshot);
     }
 
     public Tuple<ITextComponent, Boolean> getPlayerName(PlayerEntity playerEntity) {
@@ -167,5 +169,16 @@ public class PlayerEvents extends AbstractManager {
         getMod().getChatManager()
                 .notifyDiscord(new FormatTextComponent(getMod().getConfigManager().getPlayerAdvancementMessage())
                         .put("d", description).put("p", playerName).put("t", title).build().getString());
+    }
+
+    public void onScreenshot(ScreenshotEvent event) {
+        try {
+            getMod().getDiscordManager().getChannelByName(getMod().getConfigManager().getScreenshotChannel()).get()
+                    .sendFile(event.getImage().getBytes(), event.getScreenshotFile().getName()).queue();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        event.setCanceled(false);
     }
 }

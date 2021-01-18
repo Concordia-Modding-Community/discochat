@@ -31,6 +31,8 @@ public class ConfigManager extends AbstractManager {
 
     private ForgeConfigSpec.ConfigValue<String> DISCORD_TEXT_FORMAT;
 
+    private ForgeConfigSpec.ConfigValue<String> DISCORD_SCREENSHOT_CHANNEL;
+
     private final String CATEGORY_DISCORD_ROLE = "role";
 
     private ForgeConfigSpec.ConfigValue<String> DISCORD_ADMIN_ROLE;
@@ -92,6 +94,8 @@ public class ConfigManager extends AbstractManager {
         DISCORD_TEXT_FORMAT = builder.comment("Discord Command Text Format (@p = player, @m = message)")
                 .define("textFormat", "@p  @m");
 
+        DISCORD_SCREENSHOT_CHANNEL = builder.comment("Discord Screenshot Channel").define("screeshotChannel", "screenshots");
+
         buildDiscordRolesConfig(builder);
 
         buildDiscordMessagesConfig(builder);
@@ -147,6 +151,10 @@ public class ConfigManager extends AbstractManager {
 
     public String getDefaultChannel() {
         return DEFAULT_CHANNEL.get();
+    }
+
+    public String getScreenshotChannel() {
+        return DISCORD_SCREENSHOT_CHANNEL.get();
     }
 
     public ForgeConfigSpec getServerConfigs() {
@@ -219,6 +227,10 @@ public class ConfigManager extends AbstractManager {
 
     public void setDataPath(String path) {
         DATA_LOCATION.set(path);
+    }
+
+    public void setAdminRole(String role) {
+        DISCORD_ADMIN_ROLE.set(role);
     }
 
     public boolean isDiscordTokenValid() {
