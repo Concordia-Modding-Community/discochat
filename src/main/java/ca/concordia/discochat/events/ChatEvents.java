@@ -45,8 +45,11 @@ public class ChatEvents extends AbstractManager {
         } catch (Exception e) {
             e.printStackTrace();
 
-            playerEntity.sendMessage(new StringTextComponent(TextFormatting.RED + "Unable to send message."),
-                    Util.DUMMY_UUID);
+            playerEntity
+                    .sendMessage(
+                            new StringTextComponent(TextFormatting.RED + "Unable to send message."
+                                    + "Make sure your account is linked and you have the privilidges."),
+                            Util.DUMMY_UUID);
         }
 
         event.setCanceled(true);
