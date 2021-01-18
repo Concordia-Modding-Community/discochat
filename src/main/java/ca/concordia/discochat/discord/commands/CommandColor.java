@@ -15,15 +15,15 @@ public class CommandColor extends Command {
     public LiteralArgumentBuilder<CommandSourceDiscord> getParser() {
         return DiscordBrigadier.literal("color")
                 .requires(context -> context.hasRole(getMod().getConfigManager().getDiscordAdminRole()))
-                .then(DiscordBrigadier.argument("hex", StringArgumentType.greedyString())
+                .then(DiscordBrigadier.argument("hex", StringArgumentType.word())
                         .executes(context -> execute(context, this::defaultExecute)));
     }
 
     public ITextComponent defaultExecute(CommandContext<CommandSourceDiscord> context) throws CommandException {
         String textHex = StringArgumentType.getString(context, "hex");
 
-        getMod().getConfigManager().setMentionColor(textHex);
+        getMod().getConfigManager().setMentionColor("#" + textHex);
 
-        return new StringTextComponent("Mention Text Color Set.");
+        return new StringTextComponent("Set mention color to `" + "#" + textHex + "`");
     }
 }

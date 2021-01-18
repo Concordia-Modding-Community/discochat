@@ -11,6 +11,8 @@ public class ConfigManager extends AbstractManager {
 
     private final String CATEGORY_GENERAL = "general";
 
+    private ForgeConfigSpec.ConfigValue<String> MOD_NAME;
+
     private ForgeConfigSpec.ConfigValue<String> MC_COMMAND_PREFIX;
 
     private ForgeConfigSpec.ConfigValue<String> MENTION_COLOR_HEX;
@@ -60,15 +62,17 @@ public class ConfigManager extends AbstractManager {
     private void buildGeneralConfig(ForgeConfigSpec.Builder builder) {
         builder.comment("General Settings").push(CATEGORY_GENERAL);
 
+        MOD_NAME = builder.comment("Mod Name (allows to customize)").define("modName", "DiscoChat");
+
         // TODO: Better save location.
-        DATA_LOCATION = builder.comment("DiscoChat NBT Data Location (relative to server path)").define("dataLocation",
+        DATA_LOCATION = builder.comment("NBT Data Location (relative to server path)").define("dataLocation",
                 "./config/discochat.dat");
 
-        MENTION_COLOR_HEX = builder.comment("DiscoChat Discord Mention Hex Color").define("mentionColor", "#7289da");
+        MENTION_COLOR_HEX = builder.comment("Discord Mention Hex Color").define("mentionColor", "#7289da");
 
-        MC_COMMAND_PREFIX = builder.comment("DiscoChat Command Prefix").define("commandPrefix", "discord");
+        MC_COMMAND_PREFIX = builder.comment("Command Prefix").define("commandPrefix", "discord");
 
-        MC_TEXT_FORMAT = builder.comment("DiscoChat Ingame Text Format (@c = command, @p = player, @m = message)")
+        MC_TEXT_FORMAT = builder.comment("Ingame Text Format (@c = command, @p = player, @m = message)")
                 .define("textFormat", "<@p | @c> @m");
 
         builder.pop();
@@ -213,6 +217,10 @@ public class ConfigManager extends AbstractManager {
         return DISCORD_PLAYER_ADVANCEMENT.get();
     }
 
+    public String getModName() {
+        return MOD_NAME.get();
+    }
+
     public void setMCTextFormat(String textFormat) {
         MC_TEXT_FORMAT.set(textFormat);
     }
@@ -231,6 +239,10 @@ public class ConfigManager extends AbstractManager {
 
     public void setAdminRole(String role) {
         DISCORD_ADMIN_ROLE.set(role);
+    }
+
+    public void setNotificationChannel(String channelName) {
+        NOTIFICATION_CHANNEL.set(channelName);
     }
 
     public boolean isDiscordTokenValid() {

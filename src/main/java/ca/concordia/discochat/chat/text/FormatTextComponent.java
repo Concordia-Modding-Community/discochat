@@ -42,7 +42,13 @@ public class FormatTextComponent extends TextComponent {
                 siblings.add(new StringTextComponent(format.substring(pointer, start)));
             }
 
-            siblings.add(hashMap.get(matcher.group(1)));
+            String key = matcher.group(1);
+
+            if (hashMap.containsKey(key)) {
+                siblings.add(hashMap.get(key));
+            } else {
+                siblings.add(new StringTextComponent("@" + key));
+            }
 
             pointer = matcher.end();
         }

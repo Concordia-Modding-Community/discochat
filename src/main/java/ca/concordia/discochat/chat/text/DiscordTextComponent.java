@@ -1,8 +1,10 @@
 package ca.concordia.discochat.chat.text;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
+import ca.concordia.discochat.entity.ModUser;
 import ca.concordia.discochat.utils.IMod;
 import ca.concordia.discochat.utils.IModProvider;
 import ca.concordia.jddown.fragment.AtMentionFragment;
@@ -70,7 +72,11 @@ public class DiscordTextComponent extends TextComponent implements IModProvider 
 
                         mentionedDiscordUUID.add(uuid);
 
-                        mentionedMCUUID.add(userText.getUser().getMCUUID());
+                        Optional<ModUser> oUser = userText.getUser();
+
+                        if(oUser.isPresent()) {
+                            mentionedMCUUID.add(oUser.get().getMCUUID());
+                        }
 
                         break;
                     case ROLE:

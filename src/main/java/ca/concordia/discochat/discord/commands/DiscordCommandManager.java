@@ -9,7 +9,7 @@ import ca.concordia.discochat.utils.IMod;
 public class DiscordCommandManager extends AbstractManager {
     private static final Command[] COMMANDS = new Command[] { new CommandLink(), new CommandDefault(),
             new CommandMCTextFormat(), new CommandDiscordTextFormat(), new CommandColor(), new CommandData(),
-            new CommandHelp(), new CommandAdmin() };
+            new CommandHelp(), new CommandAdmin(), new CommandNotification(), new CommandUnlink() };
 
     public static Command[] getCommands() {
         return COMMANDS;

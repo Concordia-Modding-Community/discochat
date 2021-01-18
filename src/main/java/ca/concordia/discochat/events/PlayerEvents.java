@@ -64,10 +64,12 @@ public class PlayerEvents extends AbstractManager {
 
         StringTextComponent finalText = new StringTextComponent("");
 
-        finalText.append(new StringTextComponent("Welcome to DiscoChat\n\n")
+        String modName = getMod().getConfigManager().getModName();
+
+        finalText.append(new StringTextComponent("Welcome to " + modName + "\n\n")
                 .setStyle(Style.EMPTY.setBold(true).setColor(getMod().getConfigManager().getMentionColor())));
 
-        finalText.append(new StringTextComponent("DiscoChat")
+        finalText.append(new StringTextComponent(modName)
                 .setStyle(Style.EMPTY.setColor(getMod().getConfigManager().getMentionColor())));
 
         if (playerEntity.hasPermissionLevel(3) && !getMod().getConfigManager().isDiscordTokenValid()) {
@@ -84,6 +86,13 @@ public class PlayerEvents extends AbstractManager {
                                     "/" + getMod().getConfigManager().getMCCommandPrefix() + " token "))
                             .setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                                     new StringTextComponent("Click and enter your Discord bot token.")))));
+
+            finalText.append(new StringTextComponent("[More Help?]").setStyle(Style.EMPTY
+                    .setColor(Color.fromTextFormatting(TextFormatting.YELLOW)).setUnderlined(true)
+                    .setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
+                            "/" + getMod().getConfigManager().getMCCommandPrefix()))
+                    .setHoverEvent(
+                            new HoverEvent(HoverEvent.Action.SHOW_TEXT, new StringTextComponent("Click here.")))));
         } else {
             finalText.appendString(" lets you use ");
 
@@ -113,10 +122,12 @@ public class PlayerEvents extends AbstractManager {
 
             finalText.appendString(" ");
 
-            finalText.append(new StringTextComponent("[More Help?]")
-                    .setStyle(Style.EMPTY.setColor(Color.fromTextFormatting(TextFormatting.YELLOW))
-                            .setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                                    new StringTextComponent("Add me on Discord: alexandre-lavoie#8721")))));
+            finalText.append(new StringTextComponent("[More Help?]").setStyle(Style.EMPTY
+                    .setColor(Color.fromTextFormatting(TextFormatting.YELLOW)).setUnderlined(true)
+                    .setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
+                            "/" + getMod().getConfigManager().getMCCommandPrefix()))
+                    .setHoverEvent(
+                            new HoverEvent(HoverEvent.Action.SHOW_TEXT, new StringTextComponent("Click here.")))));
         }
 
         playerEntity.sendStatusMessage(finalText, false);

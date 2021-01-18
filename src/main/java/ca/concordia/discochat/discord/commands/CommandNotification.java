@@ -6,24 +6,29 @@ import com.mojang.brigadier.context.CommandContext;
 
 import ca.concordia.b4dis.CommandSourceDiscord;
 import ca.concordia.b4dis.DiscordBrigadier;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.minecraft.command.CommandException;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 
-public class CommandMCTextFormat extends Command {
+public class CommandNotification extends Command {
     @Override
     public LiteralArgumentBuilder<CommandSourceDiscord> getParser() {
-        return DiscordBrigadier.literal("mcformat")
+        return DiscordBrigadier.literal("notification")
                 .requires(context -> context.hasRole(getMod().getConfigManager().getDiscordAdminRole()))
-                .then(DiscordBrigadier.argument("format", StringArgumentType.greedyString())
+                .then(DiscordBrigadier.argument("channel", StringArgumentType.word())
                         .executes(context -> execute(context, this::defaultExecute)));
     }
 
     public ITextComponent defaultExecute(CommandContext<CommandSourceDiscord> context) throws CommandException {
-        String textFormat = StringArgumentType.getString(context, "format");
+        String channel = StringArgumentType.getString(context, "channel");
 
-        getMod().getConfigManager().setMCTextFormat(textFormat);
+        TextChannel textChannel = getMod().getDiscordManager().getChannelByName(channel)
+                .orElseThrow(() -> new CommandException(
+                        new StringTextComponent("Unable to set notification channel. Does the channel exist?")));
 
-        return new StringTextComponent("Set MC text format to `" + textFormat + "`.");
+        getMod().getConfigManager().setNotificationChannel(textChannel.getName());
+
+        return new StringTextComponent("Set notification channel to " + textChannel.getAsMention() + ".");
     }
 }

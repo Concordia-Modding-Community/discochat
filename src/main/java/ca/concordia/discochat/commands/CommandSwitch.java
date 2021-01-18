@@ -4,6 +4,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 
+import ca.concordia.discochat.Resources;
 import ca.concordia.discochat.chat.text.ChannelTextComponent;
 import ca.concordia.discochat.entity.ModUser;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -20,6 +21,7 @@ public class CommandSwitch extends Command {
     @Override
     public LiteralArgumentBuilder<CommandSource> getParser() {
         return Commands.literal("switch")
+                .then(Commands.literal("none").executes(context -> execute(context, this::noneExecute)))
                 .then(Commands.argument("channel", StringArgumentType.word()).suggests(
                         (context, builder) -> getMod().getCommandSuggestions().getAccessibleChannels(context, builder))
                         .executes(context -> execute(context, this::defaultExecute)));
@@ -38,7 +40,8 @@ public class CommandSwitch extends Command {
             }
 
             if (!user.isChannelVisible(textChannel)) {
-                sendFeedback(context, new StringTextComponent(TextFormatting.YELLOW + "You are switching to a channel that you are not listening to."));
+                sendFeedback(context, new StringTextComponent(
+                        TextFormatting.YELLOW + "You are switching to a channel that you are not listening to."));
             }
 
             user.setCurrentChannel(channel);
@@ -46,11 +49,25 @@ public class CommandSwitch extends Command {
             Style style = Style.EMPTY.setColor(Color.fromTextFormatting(TextFormatting.GREEN));
 
             return new StringTextComponent("Switched to ").setStyle(style)
-                    .append(new ChannelTextComponent(getMod(), textChannel))
-                    .appendString(".");
+                    .append(new ChannelTextComponent(getMod(), textChannel)).appendString(".");
         } catch (Exception e) {
             throw new CommandException(new StringTextComponent(TextFormatting.RED + "Unable to find channel "
                     + TextFormatting.BOLD + "#" + channel + TextFormatting.RESET + "" + TextFormatting.RED + "."));
+        }
+    }
+
+    protected ITextComponent noneExecute(CommandContext<CommandSource> context) throws CommandException {
+        try {
+            ModUser user = getSourceUser(context).get();
+
+            user.setCurrentChannel(Resources.NULL_CHANNEL);
+
+            Style style = Style.EMPTY.setColor(Color.fromTextFormatting(TextFormatting.GREEN));
+
+            return new StringTextComponent("Switched to global chat.").setStyle(style);
+        } catch (Exception e) {
+            throw new CommandException(new StringTextComponent(
+                    TextFormatting.RED + "Unable to switch channel. Did you link your account?"));
         }
     }
 }

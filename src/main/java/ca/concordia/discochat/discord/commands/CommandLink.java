@@ -32,13 +32,18 @@ public class CommandLink extends Command {
 
         String mcUUID = playerEntity.getUniqueID().toString();
 
-        getMod().getUserManager().link(mcUUID, discordUUID);
+        try {
+            getMod().getUserManager().link(mcUUID, discordUUID);
 
-        ITextComponent text = new StringTextComponent(
-                "Discord Account " + TextFormatting.BLUE + "@" + author.getAsTag() + TextFormatting.RESET + " Linked.");
+            ITextComponent text = new StringTextComponent("Discord Account " + TextFormatting.BLUE + "@"
+                    + author.getAsTag() + TextFormatting.RESET + " Linked.");
 
-        playerEntity.sendStatusMessage(text, false);
+            playerEntity.sendStatusMessage(text, false);
 
-        return new StringTextComponent("MC Account Linked.");
+            return new StringTextComponent("MC Account Linked.");
+        } catch (Exception e) {
+            throw new CommandException(
+                    new StringTextComponent("Account(s) already linked. Try unlinking your account(s)."));
+        }
     }
 }

@@ -27,7 +27,7 @@ public class CommandHelp extends Command {
 
         EmbedBuilder embed = new EmbedBuilder();
 
-        embed.setTitle("DiscoChat Help");
+        embed.setTitle(getMod().getConfigManager().getModName() + " Help");
 
         String discordPrefix = getMod().getConfigManager().getDiscordCommandPrefix();
 
@@ -39,7 +39,8 @@ public class CommandHelp extends Command {
 
         embed.setDescription(commands);
 
-        context.getSource().getTextChannel().sendMessage(embed.build()).queue();
+        context.getSource().getUser().openPrivateChannel().flatMap(channel -> channel.sendMessage(embed.build()))
+                .queue();
 
         return null;
     }

@@ -2,6 +2,8 @@ package ca.concordia.discochat.events;
 
 import com.mojang.authlib.exceptions.AuthenticationException;
 
+import ca.concordia.discochat.Resources;
+import ca.concordia.discochat.chat.text.FormatTextComponent;
 import ca.concordia.discochat.entity.ModUser;
 import ca.concordia.discochat.utils.AbstractManager;
 import ca.concordia.discochat.utils.IMod;
@@ -34,7 +36,17 @@ public class ChatEvents extends AbstractManager {
         try {
             ModUser user = ModUser.fromMCPlayerEntity(getMod(), playerEntity).get();
 
-            getMod().getChatManager().broadcastAll(user, user.getCurrentChannel(), event.getMessage());
+            String channel = user.getCurrentChannel();
+
+            if (channel.equals(Resources.NULL_CHANNEL)) {
+                throw new Exception("Null channel.");
+            }
+
+            getMod().getChatManager().broadcastAll(user, channel, event.getMessage());
+
+            event.setCanceled(true);
+
+            return;
         } catch (AuthenticationException e) {
             playerEntity
                     .sendMessage(
@@ -43,15 +55,13 @@ public class ChatEvents extends AbstractManager {
                                             + "Make sure your account is linked and you have the privilidges."),
                             Util.DUMMY_UUID);
         } catch (Exception e) {
-            e.printStackTrace();
-
-            playerEntity
-                    .sendMessage(
-                            new StringTextComponent(TextFormatting.RED + "Unable to send message."
-                                    + "Make sure your account is linked and you have the privilidges."),
-                            Util.DUMMY_UUID);
+            event.setCanceled(false);
         }
 
-        event.setCanceled(true);
+        String message = new FormatTextComponent(getMod().getConfigManager().getDiscordTextFormat())
+                .put("p", event.getUsername()).put("m", event.getMessage()).build().getString();
+
+        getMod().getDiscordManager().getChannelByName(getMod().getConfigManager().getNotificationChannel()).get()
+                .sendMessage(message).queue();
     }
 }

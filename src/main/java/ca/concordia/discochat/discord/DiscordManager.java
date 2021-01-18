@@ -121,7 +121,6 @@ public class DiscordManager extends AbstractManager {
         try {
             getMod().getChatManager().broadcastMC(message);
         } catch (Exception e) {
-            message.getChannel().sendMessage("Unable to send message to MC. Did you link your account?").queue();
         }
     }
 
@@ -154,6 +153,16 @@ public class DiscordManager extends AbstractManager {
     public Optional<TextChannel> getChannelById(String uuid) {
         try {
             return Optional.ofNullable(jda.get().getTextChannelById(uuid));
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Role> getRoleByName(String roleName) {
+        try {
+            List<Role> roles = jda.get().getRolesByName(roleName, true);
+
+            return Optional.ofNullable(roles.get(0));
         } catch (Exception e) {
             return Optional.empty();
         }

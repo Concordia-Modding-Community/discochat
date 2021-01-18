@@ -64,6 +64,22 @@ public class DataManager extends AbstractManager implements INBTSerializable<Com
         return getUserDataDiscord(user.getId());
     }
 
+    public boolean removeUserDataMC(String mcUUID) {
+        if (!playerDataNBT.contains(mcUUID)) {
+            return false;
+        }
+
+        UserData userData = getUserDataMC(mcUUID).get();
+
+        playerDataNBT.remove(mcUUID);
+
+        discordMappingNBT.remove(userData.getDiscordUUID());
+
+        saveUserData();
+
+        return true;
+    }
+
     public Optional<UserData> getUserData(PlayerEntity playerEntity) {
         return getUserDataMC(playerEntity.getUniqueID().toString());
     }

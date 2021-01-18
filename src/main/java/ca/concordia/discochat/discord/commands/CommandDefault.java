@@ -24,10 +24,10 @@ public class CommandDefault extends Command {
         String channel = StringArgumentType.getString(context, "channel");
 
         TextChannel textChannel = getMod().getDiscordManager().getChannelByName(channel)
-                .orElseThrow(() -> new CommandException(new StringTextComponent("Unable to find channel #" + channel)));
+                .orElseThrow(() -> new CommandException(new StringTextComponent("Unable to set default channel. Does the channel exist?")));
 
         getMod().getConfigManager().setDefaultChannel(textChannel.getName());
 
-        return new StringTextComponent("Set default channel to #" + textChannel.getName());
+        return new StringTextComponent("Set default channel to " + textChannel.getAsMention() + ".");
     }
 }

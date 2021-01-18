@@ -6,6 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 
 import ca.concordia.b4dis.CommandSourceDiscord;
 import ca.concordia.b4dis.DiscordBrigadier;
+import net.dv8tion.jda.api.entities.Role;
 import net.minecraft.command.CommandException;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -15,15 +16,22 @@ public class CommandAdmin extends Command {
     public LiteralArgumentBuilder<CommandSourceDiscord> getParser() {
         return DiscordBrigadier.literal("admin")
                 .requires(context -> context.hasRole(getMod().getConfigManager().getDiscordAdminRole()))
-                .then(DiscordBrigadier.argument("role", StringArgumentType.greedyString())
+                .then(DiscordBrigadier.argument("role", StringArgumentType.word())
                         .executes(context -> execute(context, this::defaultExecute)));
     }
 
     public ITextComponent defaultExecute(CommandContext<CommandSourceDiscord> context) throws CommandException {
-        String role = StringArgumentType.getString(context, "role");
+        String roleName = StringArgumentType.getString(context, "role");
 
-        getMod().getConfigManager().setAdminRole(role);
+        try {
+            Role role = getMod().getDiscordManager().getRoleByName(roleName).get();
 
-        return new StringTextComponent("Admin Role Set.");
+            getMod().getConfigManager().setAdminRole(role.getName());
+
+            return new StringTextComponent("Set admin role to " + role.getAsMention() + ".");
+        } catch(Exception e) {
+        }
+
+        throw new CommandException(new StringTextComponent("Unable to set admin role. Does the role exist?"));
     }
 }

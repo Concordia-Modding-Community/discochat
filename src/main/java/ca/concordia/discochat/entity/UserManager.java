@@ -86,8 +86,6 @@ public class UserManager extends AbstractManager {
             return Optional.ofNullable(getMod().getServerManager().getServer().get().getPlayerList()
                     .getPlayerByUUID(UUID.fromString(userData.getMCUUID())));
         } catch (Exception e) {
-            e.printStackTrace();
-
             return Optional.empty();
         }
     }

@@ -24,6 +24,6 @@ public class CommandDiscordTextFormat extends Command {
 
         getMod().getConfigManager().setDiscordTextFormat(textFormat);
 
-        return new StringTextComponent("Discord Text Format Set.");
+        return new StringTextComponent("Set discord text format to `" + textFormat + "`.");
     }
 }

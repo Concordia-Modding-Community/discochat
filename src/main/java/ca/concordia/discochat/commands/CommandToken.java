@@ -28,7 +28,7 @@ public class CommandToken extends Command {
 
         getMod().getDiscordManager().connect();
 
-        getMod().getChatManager().notifyDiscord("DiscoChat Linked!");
+        getMod().getChatManager().notifyDiscord(getMod().getConfigManager().getModName() + " Linked!");
 
         return SUCCESS;
     }

@@ -13,7 +13,15 @@ public class ChannelTextComponent extends TextComponent implements IModProvider 
     private IMod mod;
 
     public ChannelTextComponent(IMod mod, String uuid) {
-        this(mod, mod.getDiscordManager().getChannelById(uuid).get());
+        this.mod = mod;
+
+        try {
+            TextChannel textChannel = mod.getDiscordManager().getChannelById(uuid).get();
+
+            parse(textChannel);
+        } catch (Exception e) {
+            parseInvalid(uuid);
+        }
     }
 
     public ChannelTextComponent(IMod mod, TextChannel textChannel) {
@@ -31,6 +39,14 @@ public class ChannelTextComponent extends TextComponent implements IModProvider 
                 .setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
                         "/" + getMod().getConfigManager().getMCCommandPrefix() + " switch " + textChannel.getName()))
                 .setColor(getMod().getConfigManager().getMentionColor()));
+
+        siblings.add(stringText);
+    }
+
+    private void parseInvalid(String uuid) {
+        StringTextComponent stringText = new StringTextComponent("<#" + uuid + ">");
+
+        stringText.setStyle(Style.EMPTY.setColor(getMod().getConfigManager().getMentionColor()));
 
         siblings.add(stringText);
     }

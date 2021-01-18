@@ -49,8 +49,9 @@ public class CommandLink extends Command {
 
         String discriminator = String.format("%04d", intDiscriminator);
 
-        User user = getMod().getUserManager().fromDiscordTag(username, discriminator).orElseThrow(() -> new CommandException(
-                new StringTextComponent(TextFormatting.RED + "Unable to find Discord account.")));
+        User user = getMod().getUserManager().fromDiscordTag(username, discriminator)
+                .orElseThrow(() -> new CommandException(
+                        new StringTextComponent(TextFormatting.RED + "Unable to find Discord account.")));
 
         return commonExecute(commandContext, user);
     }

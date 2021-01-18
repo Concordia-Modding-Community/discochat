@@ -101,6 +101,8 @@ public class ModUser {
     }
 
     /**
+     * Gets the name of the current channel that the user is on.
+     * 
      * @return
      */
     public String getCurrentChannel() {
@@ -258,6 +260,10 @@ public class ModUser {
 
     public String getMCUUID() {
         return playerEntity.getUniqueID().toString();
+    }
+
+    public User getUser() {
+        return this.user;
     }
 
     @Override

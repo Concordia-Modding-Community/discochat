@@ -19,20 +19,24 @@ public class ChatManager extends AbstractManager {
 
     /**
      * Broadcasts a Discord message into Minecraft. This respects the Discord
-     * channel permissions.
+     * channel permissions and markdown.
      * 
      * @param playerName
      * @param messageChannel
      * @param message
      */
     public void broadcastMC(Message message) throws Exception {
-        ModUser user = ModUser.fromDiscordUser(getMod(), message.getAuthor()).get();
+        Optional<ModUser> user = ModUser.fromDiscordUser(getMod(), message.getAuthor());
 
         TextChannel channel = message.getTextChannel();
 
         DiscordTextComponent content = new DiscordTextComponent(getMod(), message.getContentRaw());
 
-        broadcastMC(new ChatMessage(getMod(), user, channel, content));
+        if (user.isPresent()) {
+            broadcastMC(new ChatMessage(getMod(), user.get(), channel, content));
+        } else {
+            broadcastMC(new ChatMessage(getMod(), message.getAuthor(), channel, content));
+        }
     }
 
     public void broadcastMC(ChatMessage chatMessage) throws Exception {
@@ -91,7 +95,7 @@ public class ChatManager extends AbstractManager {
     public void broadcastDiscord(ChatMessage chatMessage) throws Exception {
         TextChannel textChannel = chatMessage.getTextChannel();
 
-        if (chatMessage.getUser().isChannelAccessible(textChannel)) {
+        if (chatMessage.getModUser().get().isChannelAccessible(textChannel)) {
             textChannel.sendMessage(chatMessage.getDiscordText()).queue();
         }
     }
