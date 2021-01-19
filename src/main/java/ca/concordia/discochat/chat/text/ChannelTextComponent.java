@@ -1,64 +1,45 @@
 package ca.concordia.discochat.chat.text;
 
 import ca.concordia.discochat.utils.IMod;
-import ca.concordia.discochat.utils.IModProvider;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextComponent;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
 
-public class ChannelTextComponent extends TextComponent implements IModProvider {
-    private IMod mod;
-
-    public ChannelTextComponent(IMod mod, String uuid) {
-        this.mod = mod;
-
+public class ChannelTextComponent {
+    public static StringTextComponent from(IMod mod, String uuid) {
         try {
             TextChannel textChannel = mod.getDiscordManager().getChannelById(uuid).get();
 
-            parse(textChannel);
+            return parseValid(mod, textChannel);
         } catch (Exception e) {
-            parseInvalid(uuid);
+            return parseInvalid(mod, uuid);
         }
     }
 
-    public ChannelTextComponent(IMod mod, TextChannel textChannel) {
-        this.mod = mod;
-
-        parse(textChannel);
+    public static StringTextComponent from(IMod mod, TextChannel textChannel) {
+        return parseValid(mod, textChannel);
     }
 
-    private void parse(TextChannel textChannel) {
+    private static StringTextComponent parseValid(IMod mod, TextChannel textChannel) {
         StringTextComponent stringText = new StringTextComponent("#" + textChannel.getName());
 
         stringText.setStyle(Style.EMPTY
                 .setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                         new StringTextComponent("Switch to #" + textChannel.getName())))
                 .setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
-                        "/" + getMod().getConfigManager().getMCCommandPrefix() + " switch " + textChannel.getName()))
-                .setColor(getMod().getConfigManager().getMentionColor()));
+                        "/" + mod.getConfigManager().getMCCommandPrefix() + " switch " + textChannel.getName()))
+                .setColor(mod.getConfigManager().getMentionColor()));
 
-        siblings.add(stringText);
+        return stringText;
     }
 
-    private void parseInvalid(String uuid) {
+    private static StringTextComponent parseInvalid(IMod mod, String uuid) {
         StringTextComponent stringText = new StringTextComponent("<#" + uuid + ">");
 
-        stringText.setStyle(Style.EMPTY.setColor(getMod().getConfigManager().getMentionColor()));
+        stringText.setStyle(Style.EMPTY.setColor(mod.getConfigManager().getMentionColor()));
 
-        siblings.add(stringText);
-    }
-
-    @Override
-    public TextComponent copyRaw() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public IMod getMod() {
-        return mod;
+        return stringText;
     }
 }

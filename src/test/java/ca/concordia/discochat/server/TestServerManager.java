@@ -11,7 +11,6 @@ import org.junit.Test;
 
 import ca.concordia.discochat.TestMod;
 import ca.concordia.discochat.entity.TestPlayerEntity;
-import ca.concordia.discochat.server.ServerManager;
 import net.minecraft.server.MinecraftServer;
 
 public class TestServerManager {

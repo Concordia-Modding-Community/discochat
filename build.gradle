@@ -6,9 +6,11 @@ buildscript {
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath 'com.github.jengelman.gradle.plugins:shadow:4.0.4'
     }
 }
 
+apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'net.minecraftforge.gradle'
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 apply plugin: 'eclipse'
@@ -95,6 +97,49 @@ configurations {
     extraLibs
 }
 
+shadowJar {
+    classifier = '1.16'
+    configurations = [project.configurations.extraLibs]
+    relocate 'okhttp3', 'ca.concordia.discochat.shadow.okhttp'
+    relocate 'okio', 'ca.concordia.discochat.shadow.okio'
+    relocate 'club.minnced', 'ca.concordia.discochat.shadow.club.minnced'
+    relocate 'com.sun', 'ca.concordia.discochat.shadow.com.sun'
+    relocate 'com.iwebpp', 'ca.concordia.discochat.shadow.com.iwebpp'
+    relocate 'com.neovisionaries', 'ca.concordia.discochat.shadow.com.neovisionaries'
+    relocate 'gnu', 'ca.concordia.discochat.shadow.gnu'
+    relocate 'org.apache.commons.collections4', 'ca.concordia.discochat.shadow.org.apache.commons.collections4'
+    relocate('org.apache.commons.lang3', 'ca.concordia.discochat.shadow.org.apache.commons.lang3'){
+        exclude 'org.apache.commons.lang3.tuple.Pair' //Fix bug with forge
+    }
+    relocate 'org.json', 'ca.concordia.discochat.shadow.org.json'
+    relocate 'org.intellij', 'ca.concordia.discochat.shadow.org.intellij'
+    relocate 'org.jetbrains', 'ca.concordia.discochat.shadow.org.jetbrains'
+    relocate 'tomp2p', 'ca.concordia.discochat.shadow.tomp2p'
+    relocate 'com.fasterxml', 'ca.concordia.discochat.shadow.com.fasterxml'
+    relocate 'dev.vankka', 'ca.concordia.discochat.shadow.dev.vankka'
+    relocate 'net.kyori', 'ca.concordia.discochat.shadow.net.kyori'
+    relocate 'org.checkerframework', 'ca.concordia.discochat.shadow.org.checkerframework'
+    relocate 'com.moandjiezana', 'ca.concordia.discochat.shadow.com.moandjiezana'
+    relocate 'ch.lambdaj', 'ca.concordia.discochat.shadow.ch.lambdaj'
+    relocate 'emoji4j', 'ca.concordia.discochat.shadow.emoji4j'
+    relocate 'javax.annotation', 'ca.concordia.discochat.shadow.javax.annotation'
+    relocate 'net.sf', 'ca.concordia.discochat.shadow.net.sf'
+    relocate 'org.hamcrest', 'ca.concordia.discochat.shadow.org.hamcrest'
+    relocate 'org.objenesis', 'ca.concordia.discochat.shadow.org.objenesis'
+    exclude 'org/apache/commons/lang3/tuple/Pair.class' //Fix conflict with forge
+}
+
+reobf {
+    shadowJar {
+        dependsOn tasks.createMcpToSrg
+        mappings = tasks.createMcpToSrg.outputs.files.singleFile
+    }
+}
+
+artifacts {
+    archives tasks.shadowJar
+}
+
 repositories {
     jcenter()
 }
@@ -135,16 +180,13 @@ jar {
 
     from {
         configurations.extraLibs.collect { it.isDirectory() ? it : zipTree(it) }
-        configurations
-            .compile
-            .findAll { !it.name.endsWith('pom') }
-            .collect { it.isDirectory() ? it : zipTree(it) }
+        configurations.extraLibs.findAll { !it.name.endsWith('pom') }.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
 
 // Example configuration to allow publishing using the maven-publish task
 // This is the preferred method to reobfuscate your jar file
-// jar.finalizedBy('reobfJar') 
+jar.finalizedBy('reobfJar') 
 // However if you are in a multi-project build, dev time needs unobfed jar files, so you can delay the obfuscation until publishing by doing
 //publish.dependsOn('reobfJar')
 

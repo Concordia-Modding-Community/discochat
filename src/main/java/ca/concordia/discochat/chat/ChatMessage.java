@@ -56,12 +56,12 @@ public class ChatMessage implements IModProvider {
     }
 
     public ITextComponent getMCText(PlayerEntity playerEntity) {
-        UserTextComponent userText;
+        StringTextComponent userText;
 
         try {
-            userText = new UserTextComponent(mod, getModUser().get().getDiscordUUID(), textChannel);
-        } catch(Exception e) {
-            userText = new UserTextComponent(mod, user.getId(), textChannel);
+            userText = UserTextComponent.from(mod, getModUser().get().getDiscordUUID(), textChannel);
+        } catch (Exception e) {
+            userText = UserTextComponent.from(mod, user.getId(), textChannel);
         }
 
         Style style = Style.EMPTY;
@@ -70,8 +70,9 @@ public class ChatMessage implements IModProvider {
             style = style.setColor(Color.fromTextFormatting(TextFormatting.YELLOW));
         }
 
-        FormatTextComponent fullText = new FormatTextComponent(mod.getConfigManager().getMCTextFormat())
-                .put("c", new ChannelTextComponent(mod, textChannel)).put("m", message).put("p", userText).build();
+        StringTextComponent fullText = new FormatTextComponent(mod.getConfigManager().getMCTextFormat())
+                .put("c", ChannelTextComponent.from(mod, textChannel)).put("m", message.getMCString())
+                .put("p", userText).build();
 
         fullText.setStyle(style);
 

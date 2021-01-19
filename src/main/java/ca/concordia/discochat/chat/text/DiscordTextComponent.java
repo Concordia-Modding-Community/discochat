@@ -16,13 +16,13 @@ import ca.concordia.jddown.fragment.URLFragment;
 import ca.concordia.jddown.parser.DiscordTextParser;
 import net.minecraft.util.text.Color;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.Style;
 
-public class DiscordTextComponent extends TextComponent implements IModProvider {
+public class DiscordTextComponent implements IModProvider {
     private IMod mod;
     private String discordText;
+    private StringTextComponent stringText;
     private Set<String> mentionedDiscordUUID;
     private Set<String> mentionedMCUUID;
 
@@ -39,9 +39,11 @@ public class DiscordTextComponent extends TextComponent implements IModProvider 
     }
 
     private void parse(String text) {
+        this.stringText = new StringTextComponent("");
+
         new DiscordTextParser(text).stream(fragment -> {
             if (fragment instanceof TextFragment) {
-                siblings.add(new StringTextComponent(fragment.getText()));
+                this.stringText.append(new StringTextComponent(fragment.getText()));
             } else if (fragment instanceof TextFormattingFragment) {
                 StringTextComponent stringText = new StringTextComponent(fragment.getText());
 
@@ -52,9 +54,9 @@ public class DiscordTextComponent extends TextComponent implements IModProvider 
                 stringText.setStyle(Style.EMPTY.setBold(style.isBold()).setItalic(style.isItalic())
                         .setStrikethrough(style.isStrikethrough()).setUnderlined(style.isUnderline()));
 
-                siblings.add(stringText);
+                this.stringText.append(stringText);
             } else if (fragment instanceof URLFragment) {
-                siblings.add(new URLTextComponent(getMod(), fragment.getText()));
+                this.stringText.append(URLTextComponent.from(getMod(), fragment.getText()));
             } else if (fragment instanceof MentionFragment) {
                 MentionFragment mention = (MentionFragment) fragment;
 
@@ -62,17 +64,17 @@ public class DiscordTextComponent extends TextComponent implements IModProvider 
 
                 switch (mention.getType()) {
                     case CHANNEL:
-                        siblings.add(new ChannelTextComponent(getMod(), uuid));
+                        this.stringText.append(ChannelTextComponent.from(getMod(), uuid));
 
                         break;
                     case USER:
-                        UserTextComponent userText = new UserTextComponent(getMod(), uuid);
+                        StringTextComponent userText = UserTextComponent.from(getMod(), uuid);
 
-                        siblings.add(userText);
+                        this.stringText.append(userText);
 
                         mentionedDiscordUUID.add(uuid);
 
-                        Optional<ModUser> oUser = userText.getUser();
+                        Optional<ModUser> oUser = ModUser.fromDiscordUUID(getMod(), uuid);
 
                         if(oUser.isPresent()) {
                             mentionedMCUUID.add(oUser.get().getMCUUID());
@@ -80,7 +82,7 @@ public class DiscordTextComponent extends TextComponent implements IModProvider 
 
                         break;
                     case ROLE:
-                        siblings.add(new RoleTextComponent(getMod(), uuid));
+                        this.stringText.append(RoleTextComponent.from(getMod(), uuid));
 
                         break;
                 }
@@ -93,7 +95,7 @@ public class DiscordTextComponent extends TextComponent implements IModProvider 
 
                 stringText.setStyle(style);
 
-                siblings.add(stringText);
+                this.stringText.append(stringText);
             } else if (fragment instanceof EmojiFragment) {
                 EmojiFragment emojiFragment = (EmojiFragment) fragment;
 
@@ -110,7 +112,7 @@ public class DiscordTextComponent extends TextComponent implements IModProvider 
                         emoji = "?";
                 }
 
-                siblings.add(new StringTextComponent(emoji));
+                this.stringText.append(new StringTextComponent(emoji));
             }
         });
     }
@@ -127,10 +129,12 @@ public class DiscordTextComponent extends TextComponent implements IModProvider 
         return discordText;
     }
 
-    @Override
-    public TextComponent copyRaw() {
-        // TODO
-        return null;
+    public StringTextComponent getMCString() {
+        return stringText;
+    }
+
+    public String toString() {
+        return "DiscordTextComponent{}";
     }
 
     @Override
