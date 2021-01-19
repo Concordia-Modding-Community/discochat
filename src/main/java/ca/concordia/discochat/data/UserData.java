@@ -1,8 +1,10 @@
 package ca.concordia.discochat.data;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.HashSet;
-
-import org.apache.commons.lang3.SerializationUtils;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -33,7 +35,16 @@ public class UserData implements INBTSerializable<CompoundNBT> {
     public CompoundNBT serializeNBT() {
         CompoundNBT nbt = new CompoundNBT();
 
-        nbt.putByteArray(HIDDEN_CHANNELS, SerializationUtils.serialize(hiddenChannels));
+        try {
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+
+            new ObjectOutputStream(os).writeObject(hiddenChannels);
+
+            nbt.putByteArray(HIDDEN_CHANNELS, os.toByteArray());
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
         nbt.putString(DISCORD_UUID, discordUUID);
         nbt.putString(MC_UUID, mcUUID);
         nbt.putString(CURRENT_CHANNEL, currentChannel);
@@ -46,7 +57,18 @@ public class UserData implements INBTSerializable<CompoundNBT> {
         byte[] channelVisiblityBytes = nbt.getByteArray(HIDDEN_CHANNELS);
 
         if (channelVisiblityBytes.length > 0) {
-            this.hiddenChannels = SerializationUtils.deserialize(channelVisiblityBytes);
+            try {
+                ByteArrayInputStream is = new ByteArrayInputStream(channelVisiblityBytes);
+                Object obj = new ObjectInputStream(is).readObject();
+
+                if(obj instanceof HashSet<?>) {
+                    this.hiddenChannels = (HashSet<String>) obj;
+                } else {
+                    throw new Exception("Not at hashset of channels.");
+                }
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
         }
 
         this.discordUUID = nbt.getString(DISCORD_UUID);

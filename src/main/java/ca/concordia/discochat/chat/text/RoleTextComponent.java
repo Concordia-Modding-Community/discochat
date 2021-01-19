@@ -1,38 +1,30 @@
 package ca.concordia.discochat.chat.text;
 
 import ca.concordia.discochat.utils.IMod;
-import ca.concordia.discochat.utils.IModProvider;
 import net.dv8tion.jda.api.entities.Role;
 import net.minecraft.util.text.Color;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
 
-public class RoleTextComponent extends TextComponent implements IModProvider {
-    private IMod mod;
-
-    public RoleTextComponent(IMod mod, String uuid) {
-        this.mod = mod;
-
+public class RoleTextComponent {
+    public static StringTextComponent from(IMod mod, String uuid) {
         try {
             Role role = mod.getDiscordManager().getRoleById(uuid).get();
 
-            parse(role);
+            return parseValid(mod, role);
         } catch (Exception e) {
-            parseInvalid(uuid);
+            return parseInvalid(mod, uuid);
         }
     }
 
-    public RoleTextComponent(IMod mod, Role role) {
-        this.mod = mod;
-
-        parse(role);
+    public static StringTextComponent from(IMod mod, Role role) {
+        return parseValid(mod, role);
     }
 
-    private void parse(Role role) {
+    private static StringTextComponent parseValid(IMod mod, Role role) {
         StringTextComponent stringText = new StringTextComponent("@" + role.getName());
 
         stringText.setStyle(Style.EMPTY
@@ -41,26 +33,14 @@ public class RoleTextComponent extends TextComponent implements IModProvider {
                 .setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, role.getAsMention()))
                 .setColor(Color.fromInt(role.getColor().getRGB())));
 
-        siblings.add(stringText);
+        return stringText;
     }
 
-    private void parseInvalid(String uuid) {
+    private static StringTextComponent parseInvalid(IMod mod, String uuid) {
         StringTextComponent stringText = new StringTextComponent("<@&" + uuid + ">");
 
         stringText.setStyle(Style.EMPTY.setColor(Color.fromTextFormatting(TextFormatting.WHITE)));
 
-        siblings.add(stringText);
+        return stringText;
     }
-
-    @Override
-    public IMod getMod() {
-        return mod;
-    }
-
-    @Override
-    public TextComponent copyRaw() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
 }

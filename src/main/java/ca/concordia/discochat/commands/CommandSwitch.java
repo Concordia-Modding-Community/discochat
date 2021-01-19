@@ -49,7 +49,7 @@ public class CommandSwitch extends Command {
             Style style = Style.EMPTY.setColor(Color.fromTextFormatting(TextFormatting.GREEN));
 
             return new StringTextComponent("Switched to ").setStyle(style)
-                    .append(new ChannelTextComponent(getMod(), textChannel)).appendString(".");
+                    .append(ChannelTextComponent.from(getMod(), textChannel)).appendString(".");
         } catch (Exception e) {
             throw new CommandException(new StringTextComponent(TextFormatting.RED + "Unable to find channel "
                     + TextFormatting.BOLD + "#" + channel + TextFormatting.RESET + "" + TextFormatting.RED + "."));

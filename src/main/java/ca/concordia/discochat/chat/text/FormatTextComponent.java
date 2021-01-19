@@ -30,7 +30,9 @@ public class FormatTextComponent extends TextComponent {
         return this;
     }
 
-    public FormatTextComponent build() {
+    public StringTextComponent build() {
+        StringTextComponent component = new StringTextComponent("");
+
         Matcher matcher = PATTERN.matcher(format);
 
         int pointer = 0;
@@ -39,30 +41,39 @@ public class FormatTextComponent extends TextComponent {
             int start = matcher.start();
 
             if (pointer < start) {
-                siblings.add(new StringTextComponent(format.substring(pointer, start)));
+                component.append(new StringTextComponent(format.substring(pointer, start)));
             }
 
             String key = matcher.group(1);
 
             if (hashMap.containsKey(key)) {
-                siblings.add(hashMap.get(key));
+                component.append(hashMap.get(key));
             } else {
-                siblings.add(new StringTextComponent("@" + key));
+                component.append(new StringTextComponent("@" + key));
             }
 
             pointer = matcher.end();
         }
 
         if (pointer < format.length()) {
-            siblings.add(new StringTextComponent(format.substring(pointer)));
+            component.append(new StringTextComponent(format.substring(pointer)));
         }
 
-        return this;
+        return component;
+    }
+
+    @Override
+    public String toString() {
+        return "FormatTextComponent{}";
     }
 
     @Override
     public TextComponent copyRaw() {
-        // TODO Auto-generated method stub
-        return null;
+        throw new RuntimeException("FromatTextComponent should not be used raw. Use build().");
+    }
+
+    @Override
+    public String getString() {
+        throw new RuntimeException("FromatTextComponent should not be used raw. Use build().");
     }
 }

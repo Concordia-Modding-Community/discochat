@@ -34,7 +34,7 @@ public class PlayerEvents extends AbstractManager {
         bus.addListener(EventPriority.NORMAL, this::onPlayerLeave);
         bus.addListener(EventPriority.NORMAL, this::onPlayerDeath);
         bus.addListener(EventPriority.NORMAL, this::onPlayerAdvancement);
-        bus.addListener(EventPriority.NORMAL, this::onScreenshot);
+        // bus.addListener(EventPriority.NORMAL, this::onScreenshot);
     }
 
     public Tuple<ITextComponent, Boolean> getPlayerName(PlayerEntity playerEntity) {

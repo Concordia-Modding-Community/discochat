@@ -75,9 +75,9 @@ public class CommandHelp extends Command {
 
         finalText.appendString("\n\n");
 
-        finalText.append(new StringTextComponent("Styling").setStyle(Style.EMPTY.setItalic(true)));
+        finalText.append(new StringTextComponent("Styling:").setStyle(Style.EMPTY.setItalic(true)));
 
-        finalText.appendString("\n");
+        finalText.appendString(" ");
 
         finalText.append(new FormatTextComponent(
                 "**Bold** -> @b, __Underline__ -> @u, *Italic* -> @i, ~~Strikethrough~~ -> @s, http://url -> @l")

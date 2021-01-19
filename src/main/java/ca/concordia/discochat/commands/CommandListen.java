@@ -42,7 +42,7 @@ public class CommandListen extends Command {
 
         user.setChannelVisible(channel.getName());
 
-        return new FormatTextComponent("Listening to @c.").put("c", new ChannelTextComponent(getMod(), channel)).build()
+        return new FormatTextComponent("Listening to @c.").put("c", ChannelTextComponent.from(getMod(), channel)).build()
                 .setStyle(Style.EMPTY.setColor(Color.fromTextFormatting(TextFormatting.GREEN)));
     }
 
@@ -55,7 +55,7 @@ public class CommandListen extends Command {
 
         user.setChannelHidden(channel.getName());
 
-        return new FormatTextComponent("Ignoring @c.").put("c", new ChannelTextComponent(getMod(), channel)).build()
+        return new FormatTextComponent("Ignoring @c.").put("c", ChannelTextComponent.from(getMod(), channel)).build()
                 .setStyle(Style.EMPTY.setColor(Color.fromTextFormatting(TextFormatting.GREEN)));
     }
 

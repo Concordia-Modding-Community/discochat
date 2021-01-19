@@ -8,7 +8,6 @@ import static org.mockito.Mockito.when;
 
 import ca.concordia.discochat.TestMod;
 import ca.concordia.discochat.discord.TestChannel;
-import ca.concordia.discochat.server.ConfigManager;
 import net.dv8tion.jda.api.entities.MessageChannel;
 
 public class TestConfigManager {
