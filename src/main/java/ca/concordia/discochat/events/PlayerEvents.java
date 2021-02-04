@@ -38,7 +38,7 @@ public class PlayerEvents extends AbstractManager {
     }
 
     public Tuple<ITextComponent, Boolean> getPlayerName(PlayerEntity playerEntity) {
-        if (getMod().getDataManager().containsUser(playerEntity)) {
+        if (getMod().getDataManager().containsUserVerified(playerEntity)) {
             ModUser user = ModUser.fromMCUUID(getMod(), playerEntity.getUniqueID().toString()).get();
 
             return new Tuple<>(new StringTextComponent(user.getDiscordName()), true);

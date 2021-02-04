@@ -24,6 +24,43 @@ public class UserData implements INBTSerializable<CompoundNBT> {
     private static final String HIDDEN_CHANNELS = "channelVisibility";
     private HashSet<String> hiddenChannels = new HashSet<String>();
 
+    public static enum VerifyStatus {
+        NONE, MINECRAFT, DISCORD, BOTH;
+
+        public static VerifyStatus fromInt(int value) {
+            switch (value) {
+                case 0:
+                    return NONE;
+                case 1:
+                    return MINECRAFT;
+                case 2:
+                    return DISCORD;
+                case 3:
+                    return BOTH;
+                default:
+                    return null;
+            }
+        }
+
+        public int toInt() {
+            switch(this) {
+                case NONE:
+                    return 0;
+                case MINECRAFT:
+                    return 1;
+                case DISCORD:
+                    return 2;
+                case BOTH:
+                    return 3;
+                default:
+                    return 0;
+            }
+        }
+    }
+
+    private static final String VERIFY_STATUS = "verify";
+    private VerifyStatus verifyStatus = VerifyStatus.NONE;
+
     public UserData() {
     }
 
@@ -48,6 +85,7 @@ public class UserData implements INBTSerializable<CompoundNBT> {
         nbt.putString(DISCORD_UUID, discordUUID);
         nbt.putString(MC_UUID, mcUUID);
         nbt.putString(CURRENT_CHANNEL, currentChannel);
+        nbt.putInt(VERIFY_STATUS, verifyStatus.toInt());
 
         return nbt;
     }
@@ -74,6 +112,7 @@ public class UserData implements INBTSerializable<CompoundNBT> {
         this.discordUUID = nbt.getString(DISCORD_UUID);
         this.mcUUID = nbt.getString(MC_UUID);
         this.currentChannel = nbt.getString(CURRENT_CHANNEL);
+        this.verifyStatus = VerifyStatus.fromInt(nbt.getInt(VERIFY_STATUS));
     }
 
     public String getMCUUID() {
@@ -106,5 +145,13 @@ public class UserData implements INBTSerializable<CompoundNBT> {
 
     public void setHiddenChannels(HashSet<String> hiddenChannels) {
         this.hiddenChannels = hiddenChannels;
+    }
+
+    public VerifyStatus getVerifyStatus() {
+        return this.verifyStatus;
+    }
+
+    public void setVerifyStatus(VerifyStatus verifyStatus) {
+        this.verifyStatus = verifyStatus;
     }
 }

@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import ca.concordia.discochat.data.DataManager;
 import ca.concordia.discochat.data.UserData;
+import ca.concordia.discochat.data.UserData.VerifyStatus;
 import ca.concordia.discochat.utils.AbstractManager;
 import ca.concordia.discochat.utils.IMod;
 import net.dv8tion.jda.api.entities.User;
@@ -49,29 +50,30 @@ public class UserManager extends AbstractManager {
         return getMod().getDiscordManager().getUserByTag(tag);
     }
 
-    public void link(ServerPlayerEntity playerEntity, User user) throws CommandException {
-        link(Optional.ofNullable(playerEntity), Optional.ofNullable(user));
+    public void link(ServerPlayerEntity playerEntity, User user, VerifyStatus verifyStatus) throws CommandException {
+        link(Optional.ofNullable(playerEntity), Optional.ofNullable(user), verifyStatus);
     }
 
-    public void link(Optional<ServerPlayerEntity> oPlayerEntity, Optional<User> user) throws CommandException {
+    public void link(Optional<ServerPlayerEntity> oPlayerEntity, Optional<User> user, VerifyStatus verifyStatus) throws CommandException {
         PlayerEntity playerEntity = oPlayerEntity.get();
 
         String mcUUID = playerEntity.getUniqueID().toString();
 
         String discordUUID = user.get().getId();
 
-        link(mcUUID, discordUUID);
+        link(mcUUID, discordUUID, verifyStatus);
     }
 
     /**
      */
-    public void link(String mcUUID, String discordUUID) throws CommandException {
-        if (getMod().getDataManager().containsUser(mcUUID, discordUUID)) {
+    public void link(String mcUUID, String discordUUID, VerifyStatus verifyStatus) throws CommandException {
+        if (getMod().getDataManager().containsUserVerified(mcUUID, discordUUID)) {
             throw new CommandException(new StringTextComponent(TextFormatting.RED + "Account(s) already linked."));
         }
 
         getMod().getDataManager().setUserData(mcUUID, userData -> {
             userData.setDiscordUUID(discordUUID);
+            userData.setVerifyStatus(verifyStatus);
         });
     }
 

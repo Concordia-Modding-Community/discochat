@@ -6,12 +6,17 @@ import com.mojang.brigadier.context.CommandContext;
 
 import ca.concordia.b4dis.CommandSourceDiscord;
 import ca.concordia.b4dis.DiscordBrigadier;
+import ca.concordia.discochat.data.UserData.VerifyStatus;
 import net.dv8tion.jda.api.entities.User;
 import net.minecraft.command.CommandException;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.text.Color;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.event.ClickEvent;
+import net.minecraft.util.text.event.HoverEvent;
 
 public class CommandLink extends Command {
     @Override
@@ -33,14 +38,23 @@ public class CommandLink extends Command {
         String mcUUID = playerEntity.getUniqueID().toString();
 
         try {
-            getMod().getUserManager().link(mcUUID, discordUUID);
+            getMod().getUserManager().link(mcUUID, discordUUID, VerifyStatus.DISCORD);
 
-            ITextComponent text = new StringTextComponent("Discord Account " + TextFormatting.BLUE + "@"
-                    + author.getAsTag() + TextFormatting.RESET + " Linked.");
+            StringTextComponent finalText = new StringTextComponent("Discord account " + TextFormatting.BLUE + "@"
+                    + author.getAsTag() + TextFormatting.RESET + " is trying to link with this account. ");
 
-            playerEntity.sendStatusMessage(text, false);
+            finalText.append(new StringTextComponent("[Click here]").setStyle(Style.EMPTY
+                    .setColor(Color.fromTextFormatting(TextFormatting.GREEN)).setUnderlined(true)
+                    .setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
+                            "/" + getMod().getConfigManager().getMCCommandPrefix() + " verify"))
+                    .setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                            new StringTextComponent("Click to verify account.")))));
 
-            return new StringTextComponent("MC Account Linked.");
+            finalText.appendString(" to complete the linking process.");
+
+            playerEntity.sendStatusMessage(finalText, false);
+
+            return new StringTextComponent("MC Account Link Request Sent.");
         } catch (Exception e) {
             throw new CommandException(
                     new StringTextComponent("Account(s) already linked. Try unlinking your account(s)."));

@@ -9,7 +9,7 @@ import net.minecraft.command.CommandSource;
 public class CommandManager extends AbstractManager {
     public static final Command[] COMMANDS = new Command[] { new CommandToken(), new CommandStart(),
             new CommandMessage(), new CommandLink(), new CommandStop(), new CommandSwitch(), new CommandListen(),
-            new CommandUnlink(), new CommandHelp() };
+            new CommandUnlink(), new CommandHelp(), new CommandVerify() };
 
     public CommandManager(IMod mod) {
         super(mod);

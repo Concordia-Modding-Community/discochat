@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import ca.concordia.discochat.DiscoChatMod;
+import ca.concordia.discochat.data.UserData.VerifyStatus;
 import ca.concordia.discochat.utils.AbstractManager;
 import ca.concordia.discochat.utils.IMod;
 import net.dv8tion.jda.api.entities.User;
@@ -40,24 +41,34 @@ public class DataManager extends AbstractManager implements INBTSerializable<Com
         saveUserData();
     }
 
-    public boolean containsUser(User user) {
-        return containsUserDiscord(user.getId());
+    public boolean containsUserVerified(User user) {
+        return containsUserDiscordVerified(user.getId());
     }
 
-    public boolean containsUser(PlayerEntity playerEntity) {
-        return containsUserMC(playerEntity.getUniqueID().toString());
+    public boolean containsUserVerified(PlayerEntity playerEntity) {
+        return containsUserMCVerified(playerEntity.getUniqueID().toString());
     }
 
-    public boolean containsUser(String mcUUID, String discordUUID) {
-        return containsUserMC(mcUUID) || containsUserDiscord(discordUUID);
+    public boolean containsUserVerified(String mcUUID, String discordUUID) {
+        return containsUserMCVerified(mcUUID) || containsUserDiscordVerified(discordUUID);
     }
 
-    private boolean containsUserMC(String mcUUID) {
-        return playerDataNBT.contains(mcUUID);
+    public boolean containsUserDiscordVerified(String discordUUID) {
+        if (!discordMappingNBT.contains(discordUUID)) {
+            return false;
+        }
+
+        return containsUserMCVerified(discordMappingNBT.getString(discordUUID));
     }
 
-    private boolean containsUserDiscord(String discordUUID) {
-        return discordMappingNBT.contains(discordUUID);
+    private boolean containsUserMCVerified(String mcUUID) {
+        if (!playerDataNBT.contains(mcUUID)) {
+            return false;
+        }
+
+        UserData userData = getUserDataMC(mcUUID).get();
+
+        return userData.getVerifyStatus() == VerifyStatus.BOTH;
     }
 
     public Optional<UserData> getUserData(User user) {
@@ -84,7 +95,7 @@ public class DataManager extends AbstractManager implements INBTSerializable<Com
         return getUserDataMC(playerEntity.getUniqueID().toString());
     }
 
-    private Optional<UserData> getUserDataDiscord(String discordUUID) {
+    public Optional<UserData> getUserDataDiscord(String discordUUID) {
         if (!discordMappingNBT.contains(discordUUID)) {
             return Optional.empty();
         }
