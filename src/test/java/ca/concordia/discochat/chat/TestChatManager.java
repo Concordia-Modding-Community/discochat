@@ -6,7 +6,11 @@ import static org.mockito.Mockito.when;
 
 import java.util.Stack;
 
+import ca.concordia.discochat.TestMod;
+import ca.concordia.discochat.chat.text.DiscordTextComponent;
+import ca.concordia.discochat.entity.ModUser;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import net.minecraft.util.text.ITextComponent;
 
@@ -40,6 +44,14 @@ public class TestChatManager {
             return DISCORD_MESSAGES.lastElement();
         }
 
+        public static int getNumberMcMessages() {
+            return MC_MESSAGES.size();
+        }
+
+        public static int getNumberDiscordMessages() {
+            return DISCORD_MESSAGES.size();
+        }
+
         public static MessageAction createMessageAction(String message) {
             MessageAction messageAction = mock(MessageAction.class);
 
@@ -62,6 +74,10 @@ public class TestChatManager {
             when(message.getContentStripped()).thenReturn(text);
 
             return message;
+        }
+
+        public static ChatMessage createChatMessage(ModUser user, TextChannel textChannel, DiscordTextComponent message) {
+            return new ChatMessage(TestMod.Mocked.MOD, user, textChannel, message);
         }
     }
 }

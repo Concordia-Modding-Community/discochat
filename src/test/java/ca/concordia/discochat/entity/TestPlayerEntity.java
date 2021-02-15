@@ -26,6 +26,9 @@ public class TestPlayerEntity {
         public static final String VALID_MC_UUID = UUID.randomUUID().toString();
         public static final String VALID_MC_NAME = "mc-dev";
 
+        public static final String UNVERIFIED_MC_UUID = UUID.randomUUID().toString();
+        public static final String UNVERIFIED_MC_NAME = "mc-dev-unv";
+
         public static PlayerList createList() {
             PlayerList playerList = mock(PlayerList.class);
 
@@ -33,7 +36,11 @@ public class TestPlayerEntity {
                 UUID uuid = invocation.getArgument(0, UUID.class);
 
                 if (uuid.toString().equals(VALID_MC_UUID)) {
-                    return create();
+                    return createValid();
+                }
+
+                if (uuid.toString().equals(UNVERIFIED_MC_UUID)) {
+                    return createUnverified();
                 }
 
                 return null;
@@ -43,7 +50,11 @@ public class TestPlayerEntity {
                 String username = invocation.getArgument(0, String.class);
 
                 if (username.equals(VALID_MC_NAME)) {
-                    return create();
+                    return createValid();
+                }
+
+                if (username.equals(UNVERIFIED_MC_NAME)) {
+                    return createUnverified();
                 }
 
                 return null;
@@ -52,12 +63,20 @@ public class TestPlayerEntity {
             return playerList;
         }
 
-        public static ServerPlayerEntity create() {
+        public static ServerPlayerEntity createValid() {
+            return create(VALID_MC_UUID, VALID_MC_NAME);
+        }
+
+        public static ServerPlayerEntity createUnverified() {
+            return create(UNVERIFIED_MC_UUID, UNVERIFIED_MC_NAME);
+        }
+
+        public static ServerPlayerEntity create(String uuid, String name) {
             ServerPlayerEntity playerEntity = mock(ServerPlayerEntity.class);
 
-            when(playerEntity.getUniqueID()).thenReturn(UUID.fromString(VALID_MC_UUID));
+            when(playerEntity.getUniqueID()).thenReturn(UUID.fromString(uuid));
 
-            when(playerEntity.getName()).thenReturn(new StringTextComponent(VALID_MC_NAME));
+            when(playerEntity.getName()).thenReturn(new StringTextComponent(name));
 
             doAnswer(new Answer<Void>() {
                 @Override
@@ -74,7 +93,7 @@ public class TestPlayerEntity {
 
     @Test
     public void testSendStatusMessage() {
-        PlayerEntity playerEntity = Mocked.create();
+        PlayerEntity playerEntity = Mocked.createValid();
 
         playerEntity.sendStatusMessage(new StringTextComponent("Hello World!"), true);
 

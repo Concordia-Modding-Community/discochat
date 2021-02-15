@@ -1,8 +1,12 @@
 package ca.concordia.discochat.data;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.spy;
+
+import java.util.Optional;
 
 import org.junit.Test;
 
@@ -29,25 +33,39 @@ public class TestDataManager {
                 userData.setVerifyStatus(VerifyStatus.BOTH);
             });
 
+            dataManager.setUserData(TestPlayerEntity.Mocked.UNVERIFIED_MC_UUID, userData -> {
+                userData.setDiscordUUID(TestUser.Mocked.UNVERIFIED_DISCORD_UUID);
+                userData.setVerifyStatus(VerifyStatus.MINECRAFT);
+            });
+
             return dataManager;
         }
     }
 
     @Test
-    public void testGetUserDataFromPlayerEntity() {
+    public void testGetUserDataFromValidPlayerEntity() {
         DataManager dataManager = TestMod.Mocked.MOD.getDataManager();
 
-        UserData userData = dataManager.getUserData(TestPlayerEntity.Mocked.create()).get();
+        UserData userData = dataManager.getUserData(TestPlayerEntity.Mocked.createValid()).get();
 
         assertEquals(TestUser.Mocked.VALID_DISCORD_UUID, userData.getDiscordUUID());
     }
 
     @Test
-    public void testGetUserDataFromUser() {
+    public void testGetUserDataFromValidUser() {
         DataManager dataManager = TestMod.Mocked.MOD.getDataManager();
 
         UserData userData = dataManager.getUserData(TestUser.Mocked.createValid()).get();
 
         assertEquals(TestPlayerEntity.Mocked.VALID_MC_UUID, userData.getMCUUID());
+    }
+
+    @Test
+    public void testGetStatusOfUnverifiedUser() {
+        DataManager dataManager = TestMod.Mocked.MOD.getDataManager();
+
+        UserData userData = dataManager.getUserData(TestUser.Mocked.createUnverified()).get();
+
+        assertNotEquals(VerifyStatus.BOTH, userData.getVerifyStatus());
     }
 }

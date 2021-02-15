@@ -15,7 +15,7 @@ public class TestUserTextComponent {
     public void testBasic() {
         StringTextComponent text = UserTextComponent.from(TestMod.Mocked.MOD, TestUser.Mocked.createValid().getId());
 
-        assertEquals("@" + TestPlayerEntity.Mocked.create().getName().getString(), text.getString());
+        assertEquals("@" + TestPlayerEntity.Mocked.createValid().getName().getString(), text.getString());
     }
 
     @Test
@@ -23,6 +23,6 @@ public class TestUserTextComponent {
         StringTextComponent text = UserTextComponent.from(TestMod.Mocked.MOD, TestUser.Mocked.createValid().getId(),
                 TestChannel.Mocked.createValid());
 
-        assertEquals(TestPlayerEntity.Mocked.create().getName().getString(), text.getString());
+        assertEquals(TestPlayerEntity.Mocked.createValid().getName().getString(), text.getString());
     }
 }

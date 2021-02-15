@@ -1,6 +1,7 @@
 package ca.concordia.discochat.discord;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -39,7 +40,7 @@ public class TestDiscordManager {
 
                 textChannels.add(TestChannel.Mocked.createValid());
 
-                return textChannels;
+                return Optional.of(textChannels);
             });
 
             when(discordManager.getUserByTag(anyString())).then(invocation -> {
@@ -49,6 +50,11 @@ public class TestDiscordManager {
 
                 if (discordTag.equals(user.getAsTag())) {
                     return Optional.of(user);
+                }
+
+                User unverifiedUser = TestUser.Mocked.createUnverified();
+                if (discordTag.equals(unverifiedUser.getAsTag())) {
+                    return Optional.of(unverifiedUser);
                 }
 
                 return Optional.empty();
@@ -64,6 +70,11 @@ public class TestDiscordManager {
                     return Optional.of(user);
                 }
 
+                User unverifiedUser = TestUser.Mocked.createUnverified();
+                if (discordName.equals(unverifiedUser.getName()) && discordNumber.equals(unverifiedUser.getAsTag().split("#")[1])) {
+                    return Optional.of(unverifiedUser);
+                }
+
                 return Optional.empty();
             });
 
@@ -76,12 +87,23 @@ public class TestDiscordManager {
                     return Optional.of(user);
                 }
 
+                User unverifiedUser = TestUser.Mocked.createUnverified();
+                if (discordUUID.equals(unverifiedUser.getId())) {
+                    return Optional.of(unverifiedUser);
+                }
+
                 return Optional.empty();
             });
 
             when(discordManager.isConnected()).thenReturn(true);
 
             when(discordManager.connect(anyString())).thenReturn(true);
+
+            when(discordManager.isChannelAccessible(any(User.class), any(TextChannel.class))).then(invocation -> {
+                User user = invocation.getArgument(0, User.class);
+
+                return user.getId() == TestUser.Mocked.VALID_DISCORD_UUID;
+            });
 
             return discordManager;
         }

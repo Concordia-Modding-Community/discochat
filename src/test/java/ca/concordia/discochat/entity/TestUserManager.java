@@ -12,7 +12,7 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 public class TestUserManager {
     @Test
     public void getUserFromPlayerEntity() {
-        ServerPlayerEntity playerEntity = TestPlayerEntity.Mocked.create();
+        ServerPlayerEntity playerEntity = TestPlayerEntity.Mocked.createValid();
 
         UserManager userManager = TestMod.Mocked.MOD.getUserManager();
 

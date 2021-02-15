@@ -23,7 +23,7 @@ public class TestCommand {
         public static CommandSource createCommandSource(int permissionLevel) throws CommandSyntaxException {
             CommandSource commandSource = mock(CommandSource.class);
 
-            when(commandSource.asPlayer()).then(i -> TestPlayerEntity.Mocked.create());
+            when(commandSource.asPlayer()).then(i -> TestPlayerEntity.Mocked.createValid());
 
             when(commandSource.hasPermissionLevel(anyInt()))
                     .then(i -> permissionLevel >= i.getArgument(0, Integer.class));

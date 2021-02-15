@@ -21,6 +21,10 @@ public class TestUser {
         public static final String VALID_DISCORD_NUMBER = "1234";
         public static final Color VALID_COLOR = Color.BLUE;
 
+        public static final String UNVERIFIED_DISCORD_UUID = "00000";
+        public static final String UNVERIFIED_DISCORD_NAME = "discord-dev-unv";
+        public static final String UNVERIFIED_DISCORD_NUMBER = "0000";
+
         public static Member createMember(User user) {
             Member member = mock(Member.class);
 
@@ -36,6 +40,10 @@ public class TestUser {
 
         public static User createValid() {
             return create(VALID_DISCORD_UUID, VALID_DISCORD_NAME, VALID_DISCORD_NUMBER);
+        }
+
+        public static User createUnverified() {
+            return create(UNVERIFIED_DISCORD_UUID, UNVERIFIED_DISCORD_NAME, UNVERIFIED_DISCORD_NUMBER);
         }
 
         public static User create(String discordUUID, String discordName, String discordNumber) {

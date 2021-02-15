@@ -1,17 +1,22 @@
 package ca.concordia.discochat.discord;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 import org.junit.Test;
 
+import ca.concordia.discochat.TestMod;
 import ca.concordia.discochat.chat.TestChatManager;
+import ca.concordia.discochat.entity.ModUser;
+import ca.concordia.discochat.entity.TestModUser;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -98,5 +103,21 @@ public class TestChannel {
         textChannel.sendMessage("Channel Message").queue();
 
         assertEquals("Channel Message", TestChatManager.Mocked.getLastDiscordMessage());
+    }
+
+    @Test
+    public void testUnverifiedUserShouldHaveNoChannel() throws Exception {
+        ModUser modUser = TestModUser.Mocked.createUnverified();
+
+        assertEquals(0, modUser.getAccessibleChannels().size());
+    }
+
+    @Test
+    public void testValidUserShouldHaveChannels() throws Exception {
+        ModUser modUser = TestModUser.Mocked.createValid();
+
+        List<TextChannel> channels = modUser.getAccessibleChannels();
+
+        assertNotEquals(0, channels.size());
     }
 }

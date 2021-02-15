@@ -22,7 +22,7 @@ public class ModUser {
     private User user;
     private IMod mod;
 
-    private ModUser(IMod mod, Optional<ServerPlayerEntity> playerEntity, Optional<User> user) throws Exception {
+    public ModUser(IMod mod, Optional<ServerPlayerEntity> playerEntity, Optional<User> user) throws Exception {
         this.mod = mod;
 
         if (playerEntity.isPresent() && user.isPresent()) {
