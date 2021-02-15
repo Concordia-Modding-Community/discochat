@@ -7,6 +7,7 @@ import static org.mockito.Mockito.spy;
 import org.junit.Test;
 
 import ca.concordia.discochat.TestMod;
+import ca.concordia.discochat.data.UserData.VerifyStatus;
 import ca.concordia.discochat.discord.TestChannel;
 import ca.concordia.discochat.discord.TestUser;
 import ca.concordia.discochat.entity.TestPlayerEntity;
@@ -25,6 +26,7 @@ public class TestDataManager {
             dataManager.setUserData(TestPlayerEntity.Mocked.VALID_MC_UUID, userData -> {
                 userData.setDiscordUUID(TestUser.Mocked.VALID_DISCORD_UUID);
                 userData.setCurrentChannel(TestChannel.Mocked.VALID_CHANNEL_NAME);
+                userData.setVerifyStatus(VerifyStatus.BOTH);
             });
 
             return dataManager;
