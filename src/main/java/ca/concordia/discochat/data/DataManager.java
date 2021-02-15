@@ -114,6 +114,8 @@ public class DataManager extends AbstractManager implements INBTSerializable<Com
 
         CompoundNBT nbt = playerDataNBT.getCompound(mcUUID);
 
+        UserData userData = new UserData(nbt);
+
         return Optional.of(new UserData(nbt));
     }
 

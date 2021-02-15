@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import ca.concordia.discochat.chat.ChatMessage;
 import ca.concordia.discochat.data.UserData;
+import ca.concordia.discochat.data.UserData.VerifyStatus;
 import ca.concordia.discochat.utils.IMod;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -93,7 +94,13 @@ public class ModUser {
     }
 
     private Optional<UserData> getUserData() {
-        return getMod().getDataManager().getUserData(playerEntity);
+        Optional<UserData> userData = getMod().getDataManager().getUserData(playerEntity);
+
+        if (!userData.isPresent() || userData.get().getVerifyStatus() != VerifyStatus.BOTH) {
+            return Optional.empty();
+        }
+
+        return userData;
     }
 
     private void setUserData(Consumer<UserData> function) {
@@ -180,6 +187,10 @@ public class ModUser {
     public boolean isChannelVisible(MessageChannel channel) {
         try {
             UserData userData = this.getUserData().get();
+
+            if (userData.getVerifyStatus() != VerifyStatus.BOTH) {
+                throw new Exception("Account not verified");
+            }
 
             if (!isChannelAccessible(channel)) {
                 throw new Exception("Does not have channel access");

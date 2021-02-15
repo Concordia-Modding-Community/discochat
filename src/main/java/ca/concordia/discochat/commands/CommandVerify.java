@@ -26,7 +26,7 @@ public class CommandVerify extends Command {
 
         Optional<UserData> oUserData = getMod().getDataManager().getUserData(playerEntity);
 
-        if (oUserData.isEmpty()) {
+        if (!oUserData.isPresent()) {
             throw new CommandException(new StringTextComponent(
                     TextFormatting.RED + "No account to verify with your MC account. Make sure to link."));
         }

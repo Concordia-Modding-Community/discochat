@@ -45,7 +45,7 @@ public class ChatManager extends AbstractManager {
             try {
                 ModUser.fromMCPlayerEntity(getMod(), playerEntity).get().sendMCMessage(chatMessage);
             } catch (Exception e) {
-                e.printStackTrace();
+                //e.printStackTrace();
             }
         }
     }

@@ -27,7 +27,7 @@ public class CommandVerify extends Command {
 
         Optional<UserData> oUserData = getMod().getDataManager().getUserDataDiscord(discordUUID);
 
-        if (oUserData.isEmpty()) {
+        if (!oUserData.isPresent()) {
             throw new CommandException(
                     new StringTextComponent("No account to verify with your Discord account. Make sure to link."));
         }

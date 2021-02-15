@@ -85,6 +85,10 @@ public class UserManager extends AbstractManager {
         try {
             UserData userData = getMod().getDataManager().getUserData(user).get();
 
+            if (userData.getVerifyStatus() != VerifyStatus.BOTH) {
+                return Optional.empty();
+            }
+
             return Optional.ofNullable(getMod().getServerManager().getServer().get().getPlayerList()
                     .getPlayerByUUID(UUID.fromString(userData.getMCUUID())));
         } catch (Exception e) {
@@ -100,6 +104,10 @@ public class UserManager extends AbstractManager {
         DataManager dataManager = getMod().getDataManager();
 
         UserData userData = dataManager.getUserData(playerEntity).get();
+
+        if (userData.getVerifyStatus() != VerifyStatus.BOTH) {
+            return Optional.empty();
+        }
 
         return getMod().getDiscordManager().getUserFromUUID(userData.getDiscordUUID());
     }
