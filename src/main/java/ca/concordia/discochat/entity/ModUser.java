@@ -231,7 +231,7 @@ public class ModUser {
     public List<TextChannel> getInvisibleChannels() {
         try {
             return getMod().getDiscordManager().getChannels().get().stream()
-                    .filter(channel -> !this.isChannelVisible(channel)).collect(Collectors.toList());
+                    .filter(channel -> this.isChannelAccessible(channel) && !this.isChannelVisible(channel)).collect(Collectors.toList());
         } catch (Exception e) {
             return new ArrayList<TextChannel>();
         }

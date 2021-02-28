@@ -26,6 +26,7 @@ public class CommandSuggestions {
         return mod;
     }
 
+    // TODO: Prevent code duplicate.
     public CompletableFuture<Suggestions> getAccessibleChannels(CommandContext<CommandSource> context,
             SuggestionsBuilder builder) {
         List<String> channels = new ArrayList<String>();
