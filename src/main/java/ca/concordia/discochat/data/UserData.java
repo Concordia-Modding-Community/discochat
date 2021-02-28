@@ -21,8 +21,11 @@ public class UserData implements INBTSerializable<CompoundNBT> {
     private static final String CURRENT_CHANNEL = "currentChannel";
     private String currentChannel = "";
 
-    private static final String HIDDEN_CHANNELS = "channelVisibility";
+    private static final String HIDDEN_CHANNELS = "hiddenChannels";
     private HashSet<String> hiddenChannels = new HashSet<String>();
+
+    private static final String VISIBLE_CHANNELS = "visibleChannels";
+    private HashSet<String> visibleChannels = new HashSet<String>();
 
     public static enum VerifyStatus {
         NONE, MINECRAFT, DISCORD, BOTH;
@@ -62,9 +65,11 @@ public class UserData implements INBTSerializable<CompoundNBT> {
     private VerifyStatus verifyStatus = VerifyStatus.NONE;
 
     public UserData() {
+        this.visibleChannels.add(ANY_CHANNEL);
     }
 
     public UserData(CompoundNBT nbt) {
+        this();
         this.deserializeNBT(nbt);
     }
 
@@ -79,7 +84,15 @@ public class UserData implements INBTSerializable<CompoundNBT> {
 
             nbt.putByteArray(HIDDEN_CHANNELS, os.toByteArray());
         } catch(Exception e) {
-            e.printStackTrace();
+        }
+
+        try {
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+
+            new ObjectOutputStream(os).writeObject(visibleChannels);
+
+            nbt.putByteArray(VISIBLE_CHANNELS, os.toByteArray());
+        } catch(Exception e) {
         }
 
         nbt.putString(DISCORD_UUID, discordUUID);
@@ -92,20 +105,33 @@ public class UserData implements INBTSerializable<CompoundNBT> {
 
     @Override
     public void deserializeNBT(CompoundNBT nbt) {
-        byte[] channelVisiblityBytes = nbt.getByteArray(HIDDEN_CHANNELS);
+        byte[] hiddenChannelBytes = nbt.getByteArray(HIDDEN_CHANNELS);
 
-        if (channelVisiblityBytes.length > 0) {
+        if (hiddenChannelBytes.length > 0) {
             try {
-                ByteArrayInputStream is = new ByteArrayInputStream(channelVisiblityBytes);
+                ByteArrayInputStream is = new ByteArrayInputStream(hiddenChannelBytes);
                 Object obj = new ObjectInputStream(is).readObject();
 
                 if(obj instanceof HashSet<?>) {
                     this.hiddenChannels = (HashSet<String>) obj;
                 } else {
-                    throw new Exception("Not at hashset of channels.");
                 }
             } catch(Exception e) {
-                e.printStackTrace();
+            }
+        }
+
+        byte[] visibleChannelBytes = nbt.getByteArray(VISIBLE_CHANNELS);
+        
+        if (visibleChannelBytes.length > 0) {
+            try {
+                ByteArrayInputStream is = new ByteArrayInputStream(visibleChannelBytes);
+                Object obj = new ObjectInputStream(is).readObject();
+
+                if(obj instanceof HashSet<?>) {
+                    this.visibleChannels = (HashSet<String>) obj;
+                } else {
+                }
+            } catch(Exception e) {
             }
         }
 
@@ -145,6 +171,14 @@ public class UserData implements INBTSerializable<CompoundNBT> {
 
     public void setHiddenChannels(HashSet<String> hiddenChannels) {
         this.hiddenChannels = hiddenChannels;
+    }
+
+    public void setVisibleChannels(HashSet<String> visibleChannels) {
+        this.visibleChannels = visibleChannels;
+    }
+
+    public HashSet<String> getVisibleChannels() {
+        return visibleChannels;
     }
 
     public VerifyStatus getVerifyStatus() {

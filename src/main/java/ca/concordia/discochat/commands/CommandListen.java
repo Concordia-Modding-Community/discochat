@@ -38,12 +38,19 @@ public class CommandListen extends Command {
 
         String channelName = StringArgumentType.getString(context, "channel");
 
-        TextChannel channel = getMod().getDiscordManager().getChannelByName(channelName).get();
+        TextChannel channel = getMod().getDiscordManager().getChannelByName(channelName).orElseThrow(
+                () -> new CommandException(new FormatTextComponent("Cannot listen to @c.").put("c", channelName).build()
+                        .setStyle(Style.EMPTY.setColor(Color.fromTextFormatting(TextFormatting.RED)))));
+
+        if (!user.isChannelAccessible(channel)) {
+            throw new CommandException(new FormatTextComponent("Cannot listen to @c.").put("c", channelName).build()
+                    .setStyle(Style.EMPTY.setColor(Color.fromTextFormatting(TextFormatting.RED))));
+        }
 
         user.setChannelVisible(channel.getName());
 
-        return new FormatTextComponent("Listening to @c.").put("c", ChannelTextComponent.from(getMod(), channel)).build()
-                .setStyle(Style.EMPTY.setColor(Color.fromTextFormatting(TextFormatting.GREEN)));
+        return new FormatTextComponent("Listening to @c.").put("c", ChannelTextComponent.from(getMod(), channel))
+                .build().setStyle(Style.EMPTY.setColor(Color.fromTextFormatting(TextFormatting.GREEN)));
     }
 
     private ITextComponent removeExecute(CommandContext<CommandSource> context) throws CommandException {
@@ -51,7 +58,14 @@ public class CommandListen extends Command {
 
         String channelName = StringArgumentType.getString(context, "channel");
 
-        TextChannel channel = getMod().getDiscordManager().getChannelByName(channelName).get();
+        TextChannel channel = getMod().getDiscordManager().getChannelByName(channelName).orElseThrow(
+                () -> new CommandException(new FormatTextComponent("Cannot ignore @c.").put("c", channelName).build()
+                        .setStyle(Style.EMPTY.setColor(Color.fromTextFormatting(TextFormatting.RED)))));
+
+        if (!user.isChannelAccessible(channel)) {
+            throw new CommandException(new FormatTextComponent("Cannot ignore @c.").put("c", channelName).build()
+                    .setStyle(Style.EMPTY.setColor(Color.fromTextFormatting(TextFormatting.RED))));
+        }
 
         user.setChannelHidden(channel.getName());
 

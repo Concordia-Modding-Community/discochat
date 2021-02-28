@@ -136,13 +136,25 @@ public class ModUser {
      */
     public void setChannelHidden(String channelName) {
         this.setUserData(userData -> {
-            userData.getHiddenChannels().add(channelName);
+            if(userData.getVisibleChannels().contains(channelName)) {
+                userData.getVisibleChannels().remove(channelName);
+            }
+
+            if(!userData.getHiddenChannels().contains(UserData.ANY_CHANNEL)) {
+                userData.getHiddenChannels().add(channelName);
+            }
         });
     }
 
     public void setChannelVisible(String channelName) {
         this.setUserData(userData -> {
-            userData.getHiddenChannels().remove(channelName);
+            if(userData.getHiddenChannels().contains(channelName)) {
+                userData.getHiddenChannels().remove(channelName);
+            }
+
+            if(!userData.getVisibleChannels().contains(UserData.ANY_CHANNEL)) {
+                userData.getVisibleChannels().add(channelName);
+            }
         });
     }
 
@@ -152,6 +164,9 @@ public class ModUser {
     public void setAllChannelVisible() {
         this.setUserData(userData -> {
             userData.setHiddenChannels(new HashSet<>());
+            userData.setVisibleChannels(new HashSet<>());
+
+            userData.getVisibleChannels().add(UserData.ANY_CHANNEL);
         });
     }
 
@@ -161,6 +176,7 @@ public class ModUser {
     public void setNoChannelVisible() {
         this.setUserData(userData -> {
             userData.setHiddenChannels(new HashSet<>());
+            userData.setVisibleChannels(new HashSet<>());
 
             userData.getHiddenChannels().add(UserData.ANY_CHANNEL);
         });
@@ -188,21 +204,15 @@ public class ModUser {
         try {
             UserData userData = this.getUserData().get();
 
-            if (userData.getVerifyStatus() != VerifyStatus.BOTH) {
-                throw new Exception("Account not verified");
-            }
+            if (userData.getVerifyStatus() != VerifyStatus.BOTH) throw new Exception("Account not verified");
 
-            if (!isChannelAccessible(channel)) {
-                throw new Exception("Does not have channel access");
-            }
+            if (!isChannelAccessible(channel)) throw new Exception("Does not have channel access");
 
-            if (userData.getHiddenChannels().contains(UserData.ANY_CHANNEL)) {
-                throw new Exception("All channels set inivisible");
-            }
+            if (userData.getHiddenChannels().contains(channel.getName())) throw new Exception("Channel not set visibile");
 
-            if (userData.getHiddenChannels().contains(channel.getName())) {
-                throw new Exception("Channel not set visibile");
-            }
+            if (userData.getVisibleChannels().contains(channel.getName())) return true;
+
+            if (userData.getHiddenChannels().contains(UserData.ANY_CHANNEL)) throw new Exception("All channels set invisible");
         } catch (Exception e) {
             return false;
         }
