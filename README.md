@@ -1,11 +1,11 @@
-<center><h2>DiscoChat</h2></center>
+# DiscoChat
 
-<center><img src="./images/repo_image.png" alt="Repo"></center>
+<img src="./images/repo_image.png" alt="Repo">
 
-<center><a href="https://github.com/Concordia-Modding-Community/discochat/releases"><img src="https://img.shields.io/badge/Forge-1.16.X-c70039" alt="Supported Versions"></a>
+<a href="https://github.com/Concordia-Modding-Community/discochat/releases"><img src="https://img.shields.io/badge/Forge-1.16.X-c70039" alt="Supported Versions"></a>
 <a href="https://github.com/Concordia-Modding-Community/discochat/releases"><img src="https://img.shields.io/github/manifest-json/v/Concordia-Modding-Community/discochat" alt="Versions"></a>
 <a href="https://github.com/Concordia-Modding-Community/discochat/blob/main/LICENSE"><img src="https://img.shields.io/github/license/Concordia-Modding-Community/discochat" alt="License"></a>
-<a href="https://github.com/Concordia-Modding-Community/discochat/actions/workflows/gradle.yml"><img src="https://img.shields.io/github/workflow/status/Concordia-Modding-Community/discochat/Gradle%20Test" alt="Build"></a></center>
+<a href="https://github.com/Concordia-Modding-Community/discochat/actions/workflows/gradle.yml"><img src="https://img.shields.io/github/workflow/status/Concordia-Modding-Community/discochat/Gradle%20Test" alt="Build"></a>
 
 <br/>
 
