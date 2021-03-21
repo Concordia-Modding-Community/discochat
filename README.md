@@ -7,8 +7,6 @@
 <a href="https://github.com/Concordia-Modding-Community/discochat/blob/main/LICENSE"><img src="https://img.shields.io/github/license/Concordia-Modding-Community/discochat" alt="License"></a>
 <a href="https://github.com/Concordia-Modding-Community/discochat/actions/workflows/gradle.yml"><img src="https://img.shields.io/github/workflow/status/Concordia-Modding-Community/discochat/Gradle%20Test" alt="Build"></a>
 
-<br/>
-
 ## Table of Contents
 
 - [Overview](#overview)
