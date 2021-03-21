@@ -1,0 +1,6 @@
+{
+    "name": "DiscoChat",
+    "description": "Discord Integration for Minecraft Forge",
+    "default_locale": "en",
+    "version": "1.0.3"
+}
