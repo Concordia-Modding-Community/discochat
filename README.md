@@ -7,19 +7,6 @@
 <a href="https://github.com/Concordia-Modding-Community/discochat/blob/main/LICENSE"><img src="https://img.shields.io/github/license/Concordia-Modding-Community/discochat" alt="License"></a>
 <a href="https://github.com/Concordia-Modding-Community/discochat/actions/workflows/gradle.yml"><img src="https://img.shields.io/github/workflow/status/Concordia-Modding-Community/discochat/Gradle%20Test" alt="Build"></a>
 
-## Table of Contents
-
-- [Overview](#overview)
-- [Features](#features)
-- [Getting Started](#getting-started)
-    - [Discord Server](#discord-server)
-    - [Discord Bot](#discord-bot)
-    - [Minecraft Server](#minecraft-server)
-    - [Linking](#linking)
-- [Configuration](#configuration)
-- [Development](#development)
-- [Acknowledgments](#acknowledgments)
-
 ## Overview
 
 DiscoChat is a Minecraft-Discord Integration for Minecraft Forge. It is inspired by other MC-Discord Integrations like [Discord Integration](https://www.curseforge.com/minecraft/mc-mods/dcintegration) and [DiscordIntegration](https://www.curseforge.com/minecraft/mc-mods/discordintegration). This mod aims to offer more robust features to have a more Discord-like experience in Minecraft.
